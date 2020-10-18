@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "649340114924",
+    "firebase_url": "https://wildcamper-1567252089658.firebaseio.com",
+    "project_id": "wildcamper-1567252089658",
+    "storage_bucket": "wildcamper-1567252089658.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649340114924:android:0f858f4aaefe53e65a12c9",
+        "android_client_info": {
+          "package_name": "com.arkadr.wildcamper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "649340114924-r6itdip8e8dk325hvkmjnmbeou447afg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnsWLnR51GF2RzwdHSmDhb0oBB33hLKnc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "649340114924-r6itdip8e8dk325hvkmjnmbeou447afg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
