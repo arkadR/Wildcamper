@@ -1,6 +1,8 @@
+import 'package:WildcamperMobile/App/MyPlaces/my_places_screen.dart';
+import 'package:WildcamperMobile/App/Search/search_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'map_screen.dart';
+import 'Map/map_screen.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.title}) : super(key: key);
@@ -21,7 +23,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
+  final List<Widget> _navBarItems = [
+    MyPlacesScreen(),
+    MapSample(),
+    SearchScreen()
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(child: MapSample()),
+      body: Center(child: _navBarItems[_selectedIndex]),
       // floatingActionButton: FloatingActionButton(
       //   // onPressed: _incrementCounter,
       //   tooltip: 'Increment',
@@ -39,11 +46,13 @@ class _MainScreenState extends State<MainScreen> {
       // ), // This trailing comma makes auto-formatting nicer for build methods.
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("Map")),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("TODO")),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text("TODO")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.view_compact), label: 'My Places'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
         ],
         currentIndex: _selectedIndex,
+        onTap: (int index) => setState(() => _selectedIndex = index),
       ),
     );
   }
