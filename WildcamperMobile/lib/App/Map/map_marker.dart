@@ -23,6 +23,7 @@ class MapMarker extends Clusterable {
           pointsSize: pointsSize,
           childMarkerId: childMarkerId,
         );
+
   Marker toMarker() => Marker(
         markerId: MarkerId(id),
         position: LatLng(

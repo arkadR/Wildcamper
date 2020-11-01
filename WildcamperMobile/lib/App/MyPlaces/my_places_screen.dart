@@ -1,3 +1,4 @@
+import 'package:WildcamperMobile/App/Place/place_screen.dart';
 import 'package:WildcamperMobile/Domain/model/place.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,15 +26,28 @@ class _MyPlacesScreenState extends State<MyPlacesScreen> {
   Widget build(BuildContext context) {
     return ListView.builder(
         itemCount: _places.length,
-        itemBuilder: (context, index) {
-          final item = _places[index];
-          return Card(
-              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            ListTile(
-                leading: Icon(Icons.access_alarm),
-                title: Text(item.name),
-                subtitle: Text(item.placeId.toString()))
-          ]));
-        });
+        itemBuilder: (context, index) => PlaceCard(place: _places[index]));
+  }
+}
+
+class PlaceCard extends StatelessWidget {
+  final Place place;
+  PlaceCard({this.place});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Card(
+          child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+        ListTile(
+            leading: Icon(Icons.access_alarm),
+            title: Text(place.name),
+            subtitle: Text(place.placeId.toString()))
+      ])),
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => PlaceScreen(place: place)));
+      },
+    );
   }
 }

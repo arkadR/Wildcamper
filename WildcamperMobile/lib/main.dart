@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Data/Repositories/PlacesRepositoryMock.dart';
 import 'Domain/repositories/places_repository.dart';
@@ -12,6 +13,9 @@ final getIt = GetIt.instance;
 
 void setupGetIt() {
   getIt.registerSingleton<IPlacesRepository>(PlacesRepositoryMock());
+  getIt.registerSingletonAsync<SharedPreferences>(() async {
+    return await SharedPreferences.getInstance();
+  });
 }
 
 void main() {

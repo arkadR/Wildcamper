@@ -8,6 +8,8 @@ class Place {
   LatLng location;
   List<int> reviewIds;
   List<int> photoIds;
+  List<String> photoPathsDev;
 
-  Place(this.placeId, this.ownerId, this.name, this.location);
+  Place(this.placeId, this.ownerId, this.name, this.location,
+      {this.description, this.photoPathsDev});
 }
