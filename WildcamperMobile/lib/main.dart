@@ -1,21 +1,34 @@
+import 'dart:io';
+
 import 'package:WildcamperMobile/App/Authentication/login_screen.dart';
 import 'package:WildcamperMobile/App/main_screen.dart';
+import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
+import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
+import 'package:WildcamperMobile/Data/Repositories/PlacesRepository.dart';
+import 'package:dio/adapter.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'Data/Repositories/PlacesRepositoryMock.dart';
 import 'Domain/repositories/places_repository.dart';
 
 final getIt = GetIt.instance;
 
 void setupGetIt() {
-  getIt.registerSingleton<IPlacesRepository>(PlacesRepositoryMock());
-  getIt.registerSingletonAsync<SharedPreferences>(() async {
-    return await SharedPreferences.getInstance();
-  });
+  var dio = Dio();
+  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (client) {
+    client.badCertificateCallback = (cert, host, port) => true;
+  };
+  getIt.registerSingleton<Dio>(dio);
+  getIt.registerSingleton<PlacesDataAccess>(PlacesDataAccess());
+  getIt.registerSingleton<ImagesDataAccess>(ImagesDataAccess());
+  getIt.registerSingleton<IPlacesRepository>(PlacesRepository());
+  getIt.registerSingletonAsync<SharedPreferences>(
+      () async => await SharedPreferences.getInstance());
 }
 
 void main() {

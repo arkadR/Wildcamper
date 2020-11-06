@@ -30,6 +30,6 @@ class MapMarker extends Clusterable {
           position.latitude,
           position.longitude,
         ),
-        icon: icon,
+        // icon: icon,
       );
 }

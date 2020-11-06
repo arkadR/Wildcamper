@@ -4,12 +4,38 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PlacesRepositoryMock extends IPlacesRepository {
   final List<Place> places = [
-    Place(0, 123, 'Place 1', LatLng(37.43296265331129, -122.08832357078792),
-        photoPathsDev: ['assets/image.png', 'assets/image.png']),
-    Place(0, 123, 'Place 2', LatLng(37.43296265331129, -123.08832357078792)),
-    Place(0, 123, 'Place 3', LatLng(37.43296265331129, -124.08832357078792),
-        photoPathsDev: ['assets/image.png']),
-    Place(0, 123, 'Place 4', LatLng(37.43296265331129, -125.08832357078792))
+    // Place(
+    //     placeId: 0,
+    //     creatorId: 123,
+    //     name: 'Place 1',
+    //     latitude: 37.43296265331129,
+    //     longitude: -122.08832357078792,
+    //     photoPathsDev: ['assets/image.png', 'assets/image.png']),
+    // Place(
+    //     placeId: 1,
+    //     creatorId: 123,
+    //     name: 'Place 2',
+    //     latitude: 37.43296265331129,
+    //     longitude: -123.08832357078792),
+    // Place(
+    //     placeId: 2,
+    //     creatorId: 123,
+    //     name: 'Place 3',
+    //     latitude: 37.43296265331129,
+    //     longitude: -124.08832357078792,
+    //     photoPathsDev: ['assets/image.png']),
+    // Place(
+    //     placeId: 3,
+    //     creatorId: 123,
+    //     name: 'Place 4',
+    //     latitude: 37.43296265331129,
+    //     longitude: -125.08832357078792),
+    // Place(
+    //     placeId: 4,
+    //     creatorId: 123,
+    //     name: 'Place 5',
+    //     latitude: 51,
+    //     longitude: 17)
   ];
 
   @override

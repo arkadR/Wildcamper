@@ -45,8 +45,10 @@ class PlaceCard extends StatelessWidget {
             subtitle: Text(place.placeId.toString()))
       ])),
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => PlaceScreen(place: place)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PlaceScreen(placeId: place.placeId)));
       },
     );
   }

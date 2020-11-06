@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:WildcamperMobile/App/AddPlace/add_place_screen.dart';
 import 'package:WildcamperMobile/App/Map/map_marker.dart';
+import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:fluster/fluster.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -15,6 +17,7 @@ class MapSample extends StatefulWidget {
 
 class MapSampleState extends State<MapSample> {
   final _sharedPrefs = GetIt.instance<SharedPreferences>();
+  final _placesRepository = GetIt.instance<IPlacesRepository>();
   Completer<GoogleMapController> _controller = Completer();
   Location _location = Location();
 
@@ -38,15 +41,13 @@ class MapSampleState extends State<MapSample> {
       controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target: LatLng(data.latitude, data.longitude), zoom: 15)));
     });
-
-    List<MapMarker> markers = [
-      MapMarker(id: "0", position: LatLng(37, -122), icon: null)
-    ];
-    var fluster = Fluster<MapMarker>(points: markers);
-    _markers = fluster
-        .clusters([-180, -85, 180, 85], 15)
-        .map((cluster) => cluster.toMarker())
-        .toList();
+    var places = await _placesRepository.getAllPlaces();
+    var markers = places.map((place) => Marker(
+        markerId: MarkerId(place.placeId.toString()),
+        position: place.location));
+    setState(() {
+      _markers.addAll(markers);
+    });
   }
 
   @override
@@ -58,31 +59,62 @@ class MapSampleState extends State<MapSample> {
       initialPosition =
           CameraPosition(target: LatLng.fromJson(latLng), zoom: zoom ?? 15);
     }
-    return new Scaffold(
-        body: GoogleMap(
-      mapType: MapType.normal,
-      initialCameraPosition: initialPosition,
-      onMapCreated: _onMapCreated,
-      myLocationEnabled: true,
-      compassEnabled: true,
-      myLocationButtonEnabled: true,
-      markers: _markers.toSet(),
-    ));
+    return new GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: initialPosition,
+        onMapCreated: _onMapCreated,
+        myLocationEnabled: true,
+        compassEnabled: true,
+        myLocationButtonEnabled: true,
+        markers: _markers.toSet(),
+        onLongPress: (latLng) => showDialog(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+                  title: Text("Do you want to add a marker at this place?"),
+                  actions: [
+                    FlatButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: Text("Cancel")),
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                          Navigator.of(context)
+                              .push(_createAddPlaceRoute(latLng));
+                        },
+                        child: Text("Yes"))
+                  ],
+                ),
+            barrierDismissible: false));
   }
 
-  @override
-  Future<void> deactivate() async {
+  //TODO: This does not work (async dispose)
+  Future<bool> saveShit() async {
     super.deactivate();
     var controller = await _controller.future;
     var latLng = (await controller.getVisibleRegion());
     var zoom = await controller.getZoomLevel();
 
-    _sharedPrefs.setString('map_bounds', latLng.toJson());
-    _sharedPrefs.setDouble('map_zoom', zoom);
+    await _sharedPrefs.setString('map_bounds', latLng.toJson());
+    await _sharedPrefs.setDouble('map_zoom', zoom);
+
+    return true;
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onLongPress(LatLng location) {
+    setState(() {
+      var marker = Marker(
+          markerId: MarkerId(UniqueKey().toString()), position: location);
+      _markers.add(marker);
+    });
+  }
+
+  Route _createAddPlaceRoute(LatLng location) {
+    return MaterialPageRoute(
+        builder: (context) => AddPlaceScreen(location: location));
   }
 }
