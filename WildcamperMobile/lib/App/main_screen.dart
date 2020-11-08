@@ -2,7 +2,7 @@ import 'package:WildcamperMobile/App/MyPlaces/my_places_screen.dart';
 import 'package:WildcamperMobile/App/Search/search_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'Map/map_screen.dart';
+import 'Map/MapScreen.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.title}) : super(key: key);
