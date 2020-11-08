@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 class ImageDto {
-  int photoId;
+  int imageId;
   int placeId;
   int creatorId;
   String bytes;
   ImageDto({
-    this.photoId,
+    this.imageId,
     this.placeId,
     this.creatorId,
     this.bytes,
@@ -19,7 +19,7 @@ class ImageDto {
     String bytes,
   }) {
     return ImageDto(
-      photoId: photoId ?? this.photoId,
+      imageId: photoId ?? this.imageId,
       placeId: placeId ?? this.placeId,
       creatorId: creatorId ?? this.creatorId,
       bytes: bytes ?? this.bytes,
@@ -27,19 +27,21 @@ class ImageDto {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'photoId': photoId,
-      'placeId': placeId,
-      'creatorId': creatorId,
-      'bytes': bytes,
+    var obj = {
+      'ImageId': imageId,
+      'PlaceId': placeId,
+      'CreatorId': creatorId,
+      'Bytes': bytes,
     };
+    if (imageId == null) obj.remove('ImageId');
+    return obj;
   }
 
   factory ImageDto.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
 
     return ImageDto(
-      photoId: map['ImageId'],
+      imageId: map['ImageId'],
       placeId: map['PlaceId'],
       creatorId: map['CreatorId'],
       bytes: map['Bytes'],
@@ -53,7 +55,7 @@ class ImageDto {
 
   @override
   String toString() {
-    return 'ImageDto(photoId: $photoId, placeId: $placeId, creatorId: $creatorId, bytes: $bytes)';
+    return 'ImageDto(photoId: $imageId, placeId: $placeId, creatorId: $creatorId, bytes: $bytes)';
   }
 
   @override
@@ -61,7 +63,7 @@ class ImageDto {
     if (identical(this, o)) return true;
 
     return o is ImageDto &&
-        o.photoId == photoId &&
+        o.imageId == imageId &&
         o.placeId == placeId &&
         o.creatorId == creatorId &&
         o.bytes == bytes;
@@ -69,7 +71,7 @@ class ImageDto {
 
   @override
   int get hashCode {
-    return photoId.hashCode ^
+    return imageId.hashCode ^
         placeId.hashCode ^
         creatorId.hashCode ^
         bytes.hashCode;

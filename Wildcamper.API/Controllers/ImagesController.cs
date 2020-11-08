@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.OData;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Wildcamper.API.Models;
 
 namespace Wildcamper.API.Controllers
@@ -24,6 +22,23 @@ namespace Wildcamper.API.Controllers
     public IEnumerable<Image> Get()
     {
       return _context.Image;
+    }
+
+    public async Task<IActionResult> Post([FromBody] Image model)
+    {
+      if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+
+      if (_context.User.Any(u => u.UserId == model.CreatorId) == false)
+        return NotFound(nameof(Image.CreatorId));
+
+      if (_context.Place.Any(u => u.PlaceId == model.PlaceId) == false)
+        return NotFound(nameof(Image.PlaceId));
+
+
+      await _context.AddAsync(model);
+      await _context.SaveChangesAsync();
+      return Created(new Uri($"{Request.Path}/{model.ImageId}", UriKind.Relative), model);
     }
 
     // // GET: api/Images/5

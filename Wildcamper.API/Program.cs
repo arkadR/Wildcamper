@@ -1,7 +1,11 @@
+using System;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 using Wildcamper.API.Models;
 
 namespace Wildcamper.API
@@ -10,41 +14,58 @@ namespace Wildcamper.API
   {
     public static void Main(string[] args)
     {
-      var host = CreateHostBuilder(args).Build();
-      using (var scope = host.Services.CreateScope())
+      Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Debug()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .CreateLogger();
+
+      try
       {
-        var services = scope.ServiceProvider;
-        var context = scope.ServiceProvider.GetService<WildcamperContext>();
-        // SeedCountries(context);
+        var host = CreateHostBuilder(args).Build();
+        using (var scope = host.Services.CreateScope())
+        {
+          var services = scope.ServiceProvider;
+          var context = scope.ServiceProvider.GetService<WildcamperContext>();
+          // SeedCountries(context);
+        }
+        host.Run();
       }
-      host.Run();
+      catch (Exception ex)
+      {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+      }
+      finally
+      {
+        Log.CloseAndFlush();
+      }
     }
 
     private static void SeedCountries(WildcamperContext context)
     {
-      context.User.Add(new User
+      context.Add(new User
       {
         FirstName = "Arkadiusz",
         LastName = "Rasz",
         Login = "ar",
-        UserId = 10
       });
+      context.SaveChanges();
 
       context.Place.Add(new Place
       {
-        CreatorId = 10,
+        CreatorId = context.User.First().UserId,
         Description = "dsahj",
         Latitude = 51,
         Longitude = 17,
-        PlaceId = 10,
         Name = "Place1"
       });
+      context.SaveChanges();
 
       context.Image.Add(new Image
       {
-        ImageId = 10,
-        CreatorId = 10,
-        PlaceId = 10,
+        CreatorId = context.User.First().UserId,
+        PlaceId = context.Place.First().PlaceId,
         Bytes = File.ReadAllBytes("Temp/1.jpg")
       });
 
@@ -57,6 +78,7 @@ namespace Wildcamper.API
           {
             webBuilder
               .UseKestrel()
+              .UseSerilog()
               .UseUrls("https://localhost:44310", "https://192.168.0.104:44310", "https://pc-arkadr:44310")
               .UseStartup<Startup>();
           });

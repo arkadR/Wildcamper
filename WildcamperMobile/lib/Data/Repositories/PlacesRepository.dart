@@ -1,12 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:WildcamperMobile/Data/DataAccess/DTO/ImageDto.dart';
+import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceDto.dart';
 import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
 import 'package:WildcamperMobile/Domain/model/place.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image/image.dart' as img;
 
 class PlacesRepository extends IPlacesRepository {
   final PlacesDataAccess _placesDataAccess = PlacesDataAccess();
   final ImagesDataAccess _imagesDataAccess = GetIt.instance<ImagesDataAccess>();
+  final userId = 3; //TODO
+  final _targetWidth = 100;
 
   List<Place> _partLoadedPlaces = null;
   List<Place> _fullyLoadedPlaces = List();
@@ -20,7 +31,6 @@ class PlacesRepository extends IPlacesRepository {
   @override
   Future<List<Place>> getMyPlaces() async {
     _ensurePlacesLoaded();
-    int userId = 1; //TODO
     var myPlacesIds = _partLoadedPlaces
         .where((place) => place.creatorId == userId)
         .map((place) => place.placeId);
@@ -33,16 +43,18 @@ class PlacesRepository extends IPlacesRepository {
   }
 
   @override
-  Future<Place> getPlaceById(int id) async {
+  Future<Place> getPlaceById(int id, {bool force = false}) async {
     var searchResult = _fullyLoadedPlaces
         .singleWhere((place) => place.placeId == id, orElse: () => null);
-    if (searchResult != null) return searchResult;
+    if (searchResult != null && force == false) return searchResult;
 
     var res = await _placesDataAccess.getPlaceById(id);
     var placeDto = res.item1;
     var imageDtos = res.item2;
     var model = Place.fromDto(placeDto, imageDtos: imageDtos);
     _fullyLoadedPlaces.add(model);
+    _partLoadedPlaces.removeWhere((place) => place.placeId == id);
+    _partLoadedPlaces.add(model);
     return model;
   }
 
@@ -55,11 +67,43 @@ class PlacesRepository extends IPlacesRepository {
   }
 
   Future<void> _loadMyPlaces() async {
-    var userId = 1; //TODO
     var result = await _placesDataAccess.getUserPlaces(userId);
     var places = result
         .map((tuple) => Place.fromDto(tuple.item1, imageDtos: tuple.item2));
     _fullyLoadedPlaces.removeWhere((place) => place.creatorId == userId);
     _fullyLoadedPlaces.addAll(places);
+  }
+
+  @override
+  Future addPlace(String name, String description, LatLng location,
+      Iterable<String> photoPaths) async {
+    var placeDto = PlaceDto(
+        creatorId: userId,
+        description: description,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        name: name);
+
+    var placeId = await _placesDataAccess.addPlace(placeDto);
+
+    var imageDtos = List<ImageDto>();
+    for (var path in photoPaths) {
+      ImageProperties properties =
+          await FlutterNativeImage.getImageProperties(path);
+      var file = await FlutterNativeImage.compressImage(path,
+          quality: 90,
+          targetWidth: _targetWidth,
+          targetHeight:
+              (properties.height * _targetWidth / properties.width).round());
+      var bytes = await file.readAsBytes();
+      var content = base64Encode(bytes);
+      var dto = ImageDto(bytes: content, creatorId: userId, placeId: placeId);
+      imageDtos.add(dto);
+    }
+
+    for (var image in imageDtos) {
+      await _imagesDataAccess.addImage(image);
+    }
+    getPlaceById(placeId, force: true);
   }
 }

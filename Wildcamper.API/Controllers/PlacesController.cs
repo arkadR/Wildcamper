@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
 using Wildcamper.API.Models;
@@ -26,6 +28,19 @@ namespace Wildcamper.API.Controllers
     {
       var result = _context.Place.Where(p => p.PlaceId == key);
       return SingleResult.Create(result);
+    }
+
+    public async Task<IActionResult> Post([FromBody] Place model)
+    {
+      if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+
+      if (_context.User.Any(u => u.UserId == model.CreatorId) == false)
+        return NotFound(nameof(Place.PlaceId));
+
+      await _context.AddAsync(model);
+      await _context.SaveChangesAsync();
+      return Created(new Uri($"{Request.Path}/{model.PlaceId}", UriKind.Relative), model);
     }
 
     // GET: api/Places/5

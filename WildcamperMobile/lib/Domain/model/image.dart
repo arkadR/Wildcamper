@@ -17,7 +17,7 @@ class Image {
 
   factory Image.fromDto(ImageDto dto) {
     return Image(
-        photoId: dto.photoId,
+        photoId: dto.imageId,
         creatorId: dto.creatorId,
         placeId: dto.placeId,
         bytes: base64Decode(dto.bytes));

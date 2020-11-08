@@ -35,14 +35,16 @@ class PlaceDto {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'placeId': placeId,
-      'creatorId': creatorId,
-      'name': name,
-      'description': description,
-      'latitude': latitude,
-      'longitude': longitude,
+    var obj = {
+      'PlaceId': placeId,
+      'CreatorId': creatorId,
+      'Name': name,
+      'Description': description,
+      'Latitude': latitude,
+      'Longitude': longitude,
     };
+    if (placeId == null) obj.remove('PlaceId');
+    return obj;
   }
 
   factory PlaceDto.fromMap(Map<String, dynamic> map) {

@@ -34,7 +34,7 @@ namespace Wildcamper.API.Models
     {
       modelBuilder.Entity<Image>(entity =>
       {
-        entity.Property(e => e.ImageId).ValueGeneratedNever();
+        entity.Property(e => e.ImageId).ValueGeneratedOnAdd();
 
         entity.Property(e => e.AddedDate).HasColumnType("date");
 
@@ -52,7 +52,7 @@ namespace Wildcamper.API.Models
 
       modelBuilder.Entity<Place>(entity =>
       {
-        entity.Property(e => e.PlaceId).ValueGeneratedNever();
+        entity.Property(e => e.PlaceId).ValueGeneratedOnAdd();
 
         entity.Property(e => e.Description).HasMaxLength(500);
 
@@ -71,7 +71,7 @@ namespace Wildcamper.API.Models
 
       modelBuilder.Entity<Rating>(entity =>
       {
-        entity.Property(e => e.RatingId).ValueGeneratedNever();
+        entity.Property(e => e.RatingId).ValueGeneratedOnAdd();
 
         entity.Property(e => e.Comment).HasMaxLength(500);
 
@@ -92,7 +92,7 @@ namespace Wildcamper.API.Models
 
       modelBuilder.Entity<User>(entity =>
       {
-        entity.Property(e => e.UserId).ValueGeneratedNever();
+        entity.Property(e => e.UserId).ValueGeneratedOnAdd();
 
         entity.Property(e => e.FirstName)
                   .HasMaxLength(50)

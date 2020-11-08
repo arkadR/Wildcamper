@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceDto.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -37,6 +39,12 @@ class PlacesDataAccess {
           (obj['images'] as List).map((obj) => ImageDto.fromMap(obj)).toList();
       return Tuple2(placeDto, imageDtos);
     });
-    return places;
+    return places.toList();
+  }
+
+  Future<int> addPlace(PlaceDto dto) async {
+    var body = jsonDecode(jsonEncode(dto));
+    var response = await _dio.post("${_basePath}odata/places", data: body);
+    return response.data['PlaceId'];
   }
 }

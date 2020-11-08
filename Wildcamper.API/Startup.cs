@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
+using Newtonsoft.Json.Serialization;
+using Serilog;
 using Wildcamper.API.Models;
 
 namespace Wildcamper.API
@@ -22,22 +25,30 @@ namespace Wildcamper.API
 
     public void ConfigureServices(IServiceCollection services)
     {
-      // services
-      //   .AddControllersWithViews()
-      //   .AddNewtonsoftJson()
-      //   .AddJsonOptions(opts =>
-      //   {
-      //     opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-      //     opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-      //   });
+      services.AddControllers()
+        // .AddNewtonsoftJson(opts =>
+        // {
+        //   opts.SerializerSettings.
+        // })
+        // .AddJsonOptions(opts =>
+        // {
+        //   opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        //   opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        // });
+        .AddNewtonsoftJson(options =>
+        {
+          options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+        });
 
       services.AddDbContext<WildcamperContext>(options =>
         options.UseSqlServer(
           Configuration.GetConnectionString("ApplicationDbContextConnection")));
 
-      services.AddControllers();
+
 
       services.AddOData();
+
+      services.AddOpenApiDocument();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -47,11 +58,16 @@ namespace Wildcamper.API
         app.UseDeveloperExceptionPage();
       }
 
+      app.UseSerilogRequestLogging();
+
       app.UseHttpsRedirection();
 
       app.UseRouting();
 
       app.UseAuthorization();
+
+      app.UseOpenApi();
+      app.UseReDoc();
 
       app.UseEndpoints(endpoints =>
       {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Wildcamper.API.Models
@@ -11,6 +12,7 @@ namespace Wildcamper.API.Models
       Ratings = new HashSet<Rating>();
     }
 
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int PlaceId { get; set; }
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
