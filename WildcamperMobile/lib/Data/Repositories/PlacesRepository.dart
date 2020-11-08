@@ -104,6 +104,6 @@ class PlacesRepository extends IPlacesRepository {
     for (var image in imageDtos) {
       await _imagesDataAccess.addImage(image);
     }
-    getPlaceById(placeId, force: true);
+    await getPlaceById(placeId, force: true);
   }
 }

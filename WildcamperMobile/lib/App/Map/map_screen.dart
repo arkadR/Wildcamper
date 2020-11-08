@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:WildcamperMobile/App/AddPlace/add_place_screen.dart';
+import 'package:WildcamperMobile/App/AddPlace/AddPlaceScreen.dart';
 import 'package:WildcamperMobile/App/Map/map_marker.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:fluster/fluster.dart';
