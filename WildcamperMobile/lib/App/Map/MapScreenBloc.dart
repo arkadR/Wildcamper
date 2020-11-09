@@ -51,6 +51,7 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
 
   Future _positionCamera({LatLng location}) async {
     if (location == null) location = state.currentLocation;
+    if (location == null) return;
     if (_controller.isCompleted == false) return;
     if (_awaitingCameraChange == false) return;
     var controller = await _controller.future;

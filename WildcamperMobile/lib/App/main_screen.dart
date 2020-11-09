@@ -1,20 +1,16 @@
 import 'package:WildcamperMobile/App/MyPlaces/my_places_screen.dart';
 import 'package:WildcamperMobile/App/Search/search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'Firebase/FirebaseBloc.dart';
+import 'Firebase/FirebaseEvent.dart';
+import 'Firebase/FirebaseState.dart';
 import 'Map/MapScreen.dart';
+import 'package:WildcamperMobile/Infrastructure/Extensions/UserExtensions.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -34,16 +30,10 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
+      drawer: MainDrawer(),
       body: Center(child: _navBarItems[_selectedIndex]),
-      // floatingActionButton: FloatingActionButton(
-      //   // onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -56,4 +46,52 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+}
+
+class MainDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<FirebaseBloc, FirebaseState>(
+        builder: (context, state) => Drawer(
+                child: ListView(padding: EdgeInsets.zero, children: <Widget>[
+              DrawerHeader(
+                child: Column(
+                  children: [
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(state.user.getDisplayName())),
+                    Expanded(
+                        child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: SafeCircleAvatar(
+                                imageUrl: state.user.photoURL)))
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+              ),
+              ListTile(
+                title: Text('About app'),
+                onTap: () => Navigator.pop(context),
+              ),
+              ListTile(
+                title: Text('Log out'),
+                onTap: () =>
+                    BlocProvider.of<FirebaseBloc>(context).add(LoggedOut()),
+              ),
+            ])));
+  }
+}
+
+class SafeCircleAvatar extends StatelessWidget {
+  final String imageUrl;
+
+  SafeCircleAvatar({this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) => CircleAvatar(
+        backgroundImage: imageUrl == null ? null : NetworkImage(imageUrl),
+        child: imageUrl == null ? Icon(Icons.account_circle, size: 40) : null,
+      );
 }

@@ -1,4 +1,4 @@
-import 'package:WildcamperMobile/App/Place/place_screen.dart';
+import 'package:WildcamperMobile/App/Place/PlaceScreen.dart';
 import 'package:WildcamperMobile/Domain/model/place.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:flutter/cupertino.dart';

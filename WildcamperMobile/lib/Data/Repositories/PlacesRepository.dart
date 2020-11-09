@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:WildcamperMobile/Data/DataAccess/DTO/ImageDto.dart';
 import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceDto.dart';
@@ -7,11 +6,10 @@ import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
 import 'package:WildcamperMobile/Domain/model/place.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image/image.dart' as img;
 
 class PlacesRepository extends IPlacesRepository {
   final PlacesDataAccess _placesDataAccess = PlacesDataAccess();
@@ -51,7 +49,13 @@ class PlacesRepository extends IPlacesRepository {
     var res = await _placesDataAccess.getPlaceById(id);
     var placeDto = res.item1;
     var imageDtos = res.item2;
-    var model = Place.fromDto(placeDto, imageDtos: imageDtos);
+
+    var placemark =
+        await placemarkFromCoordinates(placeDto.latitude, placeDto.longitude);
+
+    var model = Place.fromDto(placeDto,
+        imageDtos: imageDtos, placemark: placemark.first);
+
     _fullyLoadedPlaces.add(model);
     _partLoadedPlaces.removeWhere((place) => place.placeId == id);
     _partLoadedPlaces.add(model);
@@ -60,7 +64,6 @@ class PlacesRepository extends IPlacesRepository {
 
   Future<void> _ensurePlacesLoaded() async {
     if (_partLoadedPlaces != null) return;
-
     var dtos = await _placesDataAccess.getAllPlaces();
     var models = dtos.map((dto) => Place.fromDto(dto)).toList();
     _partLoadedPlaces = models;

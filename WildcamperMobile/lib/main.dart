@@ -1,18 +1,17 @@
-import 'dart:io';
-
-import 'package:WildcamperMobile/App/Authentication/login_screen.dart';
+import 'package:WildcamperMobile/App/Firebase/FirebaseBloc.dart';
+import 'package:WildcamperMobile/App/Authentication/LoginScreen.dart';
 import 'package:WildcamperMobile/App/main_screen.dart';
 import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
 import 'package:WildcamperMobile/Data/Repositories/PlacesRepository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'App/Firebase/FirebaseState.dart';
 import 'Domain/repositories/places_repository.dart';
 
 final getIt = GetIt.instance;
@@ -37,65 +36,30 @@ void main() {
   runApp(Root());
 }
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
 class Root extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _initialization,
-        builder: (context, snapshot) {
-          var errorText = snapshot.error?.toString();
-          var isLoaded = snapshot.connectionState == ConnectionState.done;
-          return MaterialApp(
-              title: 'Flutter Demo',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-              ),
-              home: App(errorText: errorText, isLoaded: isLoaded));
-        });
-  }
-}
-
-class App extends StatefulWidget {
-  final String errorText;
-  bool get isLoggedIn {
-    //TODO
-    return true;
-    // return _user Credential != null;
+    return BlocProvider<FirebaseBloc>(
+        create: (context) => FirebaseBloc(),
+        child: BlocBuilder<FirebaseBloc, FirebaseState>(
+            builder: (context, state) => MaterialApp(
+                title: 'Wildcamper',
+                theme: ThemeData(
+                  primarySwatch: Colors.green,
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                ),
+                home: _getWidgetByAuthState(state.status))));
   }
 
-  final bool isLoaded;
-  UserCredential _userCredential;
+  Widget _getWidgetByAuthState(FirebaseStatus status) {
+    if (status == FirebaseStatus.unauthenticated) return LoginScreen();
+    if (status == FirebaseStatus.authenticated)
+      return MainScreen(title: 'Wildcamper');
+    if (status == FirebaseStatus.error)
+      return ErrorScreen(errorText: 'Firebase error');
 
-  App({Key key, this.isLoaded, this.errorText}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  @override
-  Widget build(BuildContext context) {
-    Widget content;
-    if (widget.isLoaded == false)
-      content = LoadingScreen();
-    else if (widget.errorText != null)
-      content = ErrorScreen(errorText: widget.errorText);
-    else if (widget.isLoggedIn == false)
-      content = LoginScreen(
-        onLoggedIn: (credential) {
-          setState(() {
-            widget._userCredential = credential;
-          });
-        },
-      );
-    else
-      content = MainScreen(title: 'Wildcamper');
-    return content;
+    if (status == FirebaseStatus.uninitialized) return LoadingScreen();
+    throw Exception("Invalid FirebaseAuth state");
   }
 }
 
