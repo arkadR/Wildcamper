@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceDto.dart';
+import 'package:WildcamperMobile/Data/DataAccess/DTO/RatingDto.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tuple/tuple.dart';
@@ -9,7 +10,7 @@ import 'DTO/ImageDto.dart';
 
 class PlacesDataAccess {
   final Dio _dio = GetIt.instance<Dio>();
-  final String _basePath = 'https://192.168.0.104:44310/';
+  final String _basePath = 'https://192.168.0.102:44310/';
 
   Future<List<PlaceDto>> getAllPlaces() async {
     var response = await _dio.get("${_basePath}odata/places");
@@ -19,14 +20,18 @@ class PlacesDataAccess {
     return places;
   }
 
-  Future<Tuple2<PlaceDto, List<ImageDto>>> getPlaceById(int id) async {
+  Future<Tuple3<PlaceDto, List<ImageDto>, List<RatingDto>>> getPlaceById(
+      int id) async {
     var response =
-        await _dio.get("${_basePath}odata/places($id)?\$expand=Images");
+        await _dio.get("${_basePath}odata/places($id)?\$expand=Images,Ratings");
     var place = PlaceDto.fromMap(response.data);
     var images = (response.data['Images'] as List)
         .map((obj) => ImageDto.fromMap(obj))
         .toList();
-    return Tuple2(place, images);
+    var ratings = (response.data['Ratings'] as List)
+        .map((obj) => RatingDto.fromMap(obj))
+        .toList();
+    return Tuple3(place, images, ratings);
   }
 
   Future<List<Tuple2<PlaceDto, List<ImageDto>>>> getUserPlaces(

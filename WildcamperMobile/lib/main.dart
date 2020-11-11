@@ -3,7 +3,10 @@ import 'package:WildcamperMobile/App/Authentication/LoginScreen.dart';
 import 'package:WildcamperMobile/App/main_screen.dart';
 import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
+import 'package:WildcamperMobile/Data/DataAccess/RatingsDataAccess.dart';
 import 'package:WildcamperMobile/Data/Repositories/PlacesRepository.dart';
+import 'package:WildcamperMobile/Data/Repositories/RatingsRepository.dart';
+import 'package:WildcamperMobile/Domain/repositories/IRatingsRepository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +28,9 @@ void setupGetIt() {
   getIt.registerSingleton<Dio>(dio);
   getIt.registerSingleton<PlacesDataAccess>(PlacesDataAccess());
   getIt.registerSingleton<ImagesDataAccess>(ImagesDataAccess());
+  getIt.registerSingleton<RatingsDataAccess>(RatingsDataAccess());
   getIt.registerSingleton<IPlacesRepository>(PlacesRepository());
+  getIt.registerSingleton<IRatingsRepository>(RatingsRepository());
   getIt.registerSingletonAsync<SharedPreferences>(
       () async => await SharedPreferences.getInstance());
 }

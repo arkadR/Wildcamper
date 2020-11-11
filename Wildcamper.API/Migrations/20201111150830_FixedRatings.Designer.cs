@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wildcamper.API.Models;
 
 namespace Wildcamper.API.Migrations
 {
     [DbContext(typeof(WildcamperContext))]
-    partial class WildcamperContextModelSnapshot : ModelSnapshot
+    [Migration("20201111150830_FixedRatings")]
+    partial class FixedRatings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

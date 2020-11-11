@@ -79,7 +79,7 @@ namespace Wildcamper.API
             webBuilder
               .UseKestrel()
               .UseSerilog()
-              .UseUrls("https://localhost:44310", "https://192.168.0.104:44310", "https://pc-arkadr:44310")
+              .UseUrls("https://localhost:44310", "https://192.168.0.102:44310", "https://pc-arkadr:44310")
               .UseStartup<Startup>();
           });
   }

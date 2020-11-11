@@ -7,7 +7,7 @@ import 'DTO/ImageDto.dart';
 
 class ImagesDataAccess {
   final Dio _dio = GetIt.instance<Dio>();
-  final String _basePath = 'https://192.168.0.104:44310/';
+  final String _basePath = 'https://192.168.0.102:44310/';
 
   Future<List<ImageDto>> getAllImages() async {
     var response = await _dio.get("${_basePath}odata/images");

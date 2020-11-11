@@ -49,12 +49,15 @@ class PlacesRepository extends IPlacesRepository {
     var res = await _placesDataAccess.getPlaceById(id);
     var placeDto = res.item1;
     var imageDtos = res.item2;
+    var ratingDtos = res.item3;
 
     var placemark =
         await placemarkFromCoordinates(placeDto.latitude, placeDto.longitude);
 
     var model = Place.fromDto(placeDto,
-        imageDtos: imageDtos, placemark: placemark.first);
+        imageDtos: imageDtos,
+        ratingDtos: ratingDtos,
+        placemark: placemark.first);
 
     _fullyLoadedPlaces.add(model);
     _partLoadedPlaces.removeWhere((place) => place.placeId == id);

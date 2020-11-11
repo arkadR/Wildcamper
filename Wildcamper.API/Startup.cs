@@ -84,6 +84,7 @@ namespace Wildcamper.API
       odataBuilder.EntitySet<User>("Users");
       odataBuilder.EntitySet<Place>("Places");
       odataBuilder.EntitySet<Image>("Images");
+      odataBuilder.EntitySet<Rating>("Ratings");
 
       return odataBuilder.GetEdmModel();
     }

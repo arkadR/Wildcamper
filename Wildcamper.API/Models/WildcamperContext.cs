@@ -75,7 +75,6 @@ namespace Wildcamper.API.Models
 
         entity.Property(e => e.Comment).HasMaxLength(500);
 
-        entity.Property(e => e.Rating1).HasColumnName("Ratings");
 
         entity.HasOne(d => d.Creator)
                   .WithMany(p => p.Rating)
