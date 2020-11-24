@@ -1,4 +1,4 @@
-import 'package:WildcamperMobile/Domain/model/place.dart';
+import 'package:WildcamperMobile/Domain/model/Place.dart';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -43,4 +43,13 @@ class CameraMoved extends MapScreenEvent {
 
   @override
   List<Object> get props => [cameraPosition];
+}
+
+class MarkerTapped extends MapScreenEvent {
+  final Place place;
+
+  MarkerTapped(this.place);
+
+  @override
+  List<Object> get props => [place];
 }

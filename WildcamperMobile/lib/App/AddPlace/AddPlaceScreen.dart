@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:WildcamperMobile/App/AddPlace/AddPlaceScreenBloc.dart';
 import 'package:WildcamperMobile/App/AddPlace/AddPlaceScreenEvent.dart';
+import 'package:WildcamperMobile/App/MapPreview/MapPreview.dart';
+import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceTypeDto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,32 +37,74 @@ class AddPlaceScreen extends StatelessWidget {
                         _getAppBarAction(context, state.loadingStatus)
                       ],
                     ),
-                    body: Column(children: [
-                      TextFormField(
-                          decoration: InputDecoration(
-                              labelText: 'Name',
-                              errorText: state.name.isEmpty
-                                  ? "Please enter a name"
-                                  : null),
-                          onChanged: (value) =>
-                              bloc(context).add(NameChanged(name: value))),
-                      TextFormField(
-                          decoration: InputDecoration(labelText: 'Description'),
-                          onChanged: (value) => bloc(context)
-                              .add(DescriptionChanged(description: value))),
-                      Text(location.toString()),
-                      Expanded(
-                          child: GridView.count(crossAxisCount: 3, children: [
-                        ...state.imagePaths
-                            .map((path) => Image.file(File(path)))
-                            .toList(),
-                        GestureDetector(
-                          child: Icon(Icons.add_a_photo),
-                          onTap: () =>
-                              bloc(context).add(AddImageButtonClicked()),
-                        )
-                      ]))
-                    ])))));
+                    body: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(children: [
+                        Row(
+                          children: [
+                            Text(
+                              "Type: ",
+                              textScaleFactor: 1.2,
+                            ),
+                            state.availablePlaceTypes.isNotEmpty
+                                ? DropdownButton<PlaceTypeDto>(
+                                    value: state.selectedPlaceType,
+                                    items: state.availablePlaceTypes
+                                        .map((type) =>
+                                            DropdownMenuItem<PlaceTypeDto>(
+                                                value: type,
+                                                child: Text(type.name)))
+                                        .toList(),
+                                    onChanged: (value) => bloc(context)
+                                        .add(PlaceTypeChanged(value)))
+                                : SizedBox(),
+                          ],
+                        ),
+                        TextField(
+                            decoration: InputDecoration(
+                                labelText: 'Title',
+                                errorText: state.name.isEmpty
+                                    ? "Please enter a title"
+                                    : null),
+                            maxLength: 50,
+                            maxLengthEnforced: true,
+                            onChanged: (value) =>
+                                bloc(context).add(NameChanged(name: value))),
+                        TextField(
+                            decoration:
+                                InputDecoration(labelText: 'Description'),
+                            maxLength: 500,
+                            onChanged: (value) => bloc(context)
+                                .add(DescriptionChanged(description: value))),
+                        Container(
+                            height: 200, child: MapPreview(location: location)),
+                        SizedBox(height: 30),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text('Add pictures:', textScaleFactor: 1.5)),
+                        SizedBox(height: 10),
+                        Expanded(
+                            child: GridView.count(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                children: [
+                              ...state.imagePaths
+                                  .map((path) => Container(
+                                      color: Colors.grey[200],
+                                      child: Image.file(File(path))))
+                                  .toList(),
+                              GestureDetector(
+                                onTap: () =>
+                                    bloc(context).add(AddImageButtonClicked()),
+                                child: Container(
+                                  color: Colors.grey[200],
+                                  child: Icon(Icons.add_a_photo),
+                                ),
+                              )
+                            ]))
+                      ]),
+                    )))));
   }
 
   Widget _getAppBarAction(

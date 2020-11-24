@@ -1,3 +1,3 @@
 abstract class IRatingsRepository {
-  Future<int> addRating(int userId, int placeId, String comment, int stars);
+  Future<int> addRating(String userId, int placeId, String comment, int stars);
 }

@@ -1,4 +1,5 @@
 import 'package:WildcamperMobile/Domain/repositories/IRatingsRepository.dart';
+import 'package:WildcamperMobile/Infrastructure/UserProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -12,7 +13,8 @@ class AddReviewSectionBloc
 
   final IRatingsRepository _ratingsRepository =
       GetIt.instance<IRatingsRepository>();
-  int userId = 3; //TODO
+  final UserProvider _userProvider = GetIt.instance<UserProvider>();
+  String get userId => _userProvider.getCurrentUser().uid;
 
   AddReviewSectionBloc({@required this.placeId})
       : super(AddReviewSectionState.initial());

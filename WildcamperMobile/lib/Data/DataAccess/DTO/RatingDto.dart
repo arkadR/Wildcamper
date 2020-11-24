@@ -3,7 +3,7 @@ import 'dart:convert';
 class RatingDto {
   int ratingId;
   int placeId;
-  int creatorId;
+  String creatorId;
   String comment;
   int stars;
   RatingDto({
@@ -17,7 +17,7 @@ class RatingDto {
   RatingDto copyWith({
     int ratingId,
     int placeId,
-    int creatorId,
+    String creatorId,
     String comment,
     int stars,
   }) {

@@ -1,5 +1,5 @@
-import 'package:WildcamperMobile/App/MyPlaces/my_places_screen.dart';
-import 'package:WildcamperMobile/Domain/model/place.dart';
+import 'package:WildcamperMobile/App/PlaceCard/PlaceCard.dart';
+import 'package:WildcamperMobile/Domain/model/Place.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,9 +51,10 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       Expanded(
           child: ListView.builder(
-              itemCount: _visiblePlaces.length,
-              itemBuilder: (context, index) =>
-                  PlaceCard(place: _visiblePlaces[index])))
+              itemCount: _visiblePlaces?.length ?? 0,
+              itemBuilder: (context, index) => Padding(
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  child: PlaceCard(place: _visiblePlaces[index]))))
     ]);
   }
 }

@@ -24,3 +24,5 @@ class PasswordChanged extends LoginScreenEvent {
 class LoginButtonClicked extends LoginScreenEvent {}
 
 class RegisterButtonClicked extends LoginScreenEvent {}
+
+class LoginWithGoogleClicked extends LoginScreenEvent {}

@@ -2,27 +2,36 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
+import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceTypeDto.dart';
+
 class AddPlaceScreenState extends Equatable {
   final String name;
   final String description;
   final List<String> imagePaths;
   final bool isValid;
   final AddPlaceScreenFormStatus loadingStatus;
-
-  factory AddPlaceScreenState.initial() => AddPlaceScreenState(
-      name: "",
-      description: "",
-      isValid: false,
-      imagePaths: List(),
-      loadingStatus: AddPlaceScreenFormStatus.invalid);
-
+  final List<PlaceTypeDto> availablePlaceTypes;
+  final PlaceTypeDto selectedPlaceType;
   AddPlaceScreenState({
     this.name,
     this.description,
     this.imagePaths,
     this.isValid,
     this.loadingStatus,
+    this.availablePlaceTypes,
+    this.selectedPlaceType,
   });
+
+  factory AddPlaceScreenState.initial() {
+    return AddPlaceScreenState(
+        name: "",
+        description: "",
+        isValid: false,
+        imagePaths: List(),
+        loadingStatus: AddPlaceScreenFormStatus.invalid,
+        availablePlaceTypes: List(),
+        selectedPlaceType: null);
+  }
 
   AddPlaceScreenState copyWith({
     String name,
@@ -30,6 +39,8 @@ class AddPlaceScreenState extends Equatable {
     List<String> imagePaths,
     bool isValid,
     AddPlaceScreenFormStatus loadingStatus,
+    List<PlaceTypeDto> availablePlaceTypes,
+    PlaceTypeDto selectedPlaceType,
   }) {
     return AddPlaceScreenState(
       name: name ?? this.name,
@@ -37,6 +48,8 @@ class AddPlaceScreenState extends Equatable {
       imagePaths: imagePaths ?? this.imagePaths,
       isValid: isValid ?? this.isValid,
       loadingStatus: loadingStatus ?? this.loadingStatus,
+      availablePlaceTypes: availablePlaceTypes ?? this.availablePlaceTypes,
+      selectedPlaceType: selectedPlaceType ?? this.selectedPlaceType,
     );
   }
 
@@ -47,6 +60,9 @@ class AddPlaceScreenState extends Equatable {
       'imagePaths': imagePaths,
       'isValid': isValid,
       'loadingStatus': loadingStatus,
+      'availablePlaceTypes':
+          availablePlaceTypes?.map((x) => x?.toMap())?.toList(),
+      'selectedPlaceType': selectedPlaceType?.toMap(),
     };
   }
 
@@ -59,6 +75,9 @@ class AddPlaceScreenState extends Equatable {
       imagePaths: List<String>.from(map['imagePaths']),
       isValid: map['isValid'],
       loadingStatus: map['loadingStatus'],
+      availablePlaceTypes: List<PlaceTypeDto>.from(
+          map['availablePlaceTypes']?.map((x) => PlaceTypeDto.fromMap(x))),
+      selectedPlaceType: PlaceTypeDto.fromMap(map['selectedPlaceType']),
     );
   }
 
@@ -78,6 +97,8 @@ class AddPlaceScreenState extends Equatable {
       imagePaths,
       isValid,
       loadingStatus,
+      availablePlaceTypes,
+      selectedPlaceType,
     ];
   }
 }

@@ -1,7 +1,7 @@
 import 'package:WildcamperMobile/App/MapPreview/MapPreview.dart';
 import 'package:WildcamperMobile/App/Widgets/image_view.dart';
 import 'package:WildcamperMobile/Domain/model/Rating.dart';
-import 'package:WildcamperMobile/Domain/model/place.dart';
+import 'package:WildcamperMobile/Domain/model/Place.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,55 +24,56 @@ class PlaceScreen extends StatelessWidget {
     return BlocProvider<PlaceScreenBloc>(
         create: (context) => PlaceScreenBloc(placeId),
         child: BlocBuilder<PlaceScreenBloc, PlaceScreenState>(
-            builder: (context, state) {
-          if (state.place == null) {
-            return CircularProgressIndicator();
-          } else {
-            return Scaffold(
-                floatingActionButton: FloatingActionButton(
-                    onPressed: () {
-                      openMapsSheet(context, state.place);
-                    },
-                    child: Icon(Icons.navigation)),
-                body: CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverAppBar(
-                          title: Text(state.place.name),
-                          snap: true,
-                          floating: true,
-                          pinned: true,
-                          expandedHeight: 200,
-                          flexibleSpace: FlexibleSpaceBar(
-                              background: PageView.builder(
-                                  itemCount: state.place.images?.length ?? 0,
-                                  controller: PageController(),
-                                  itemBuilder: (_, i) {
-                                    return GestureDetector(
-                                        child: Positioned.fill(
-                                            child: Image.memory(
-                                          state.place.images[i].bytes,
-                                          fit: BoxFit.fill,
-                                        )),
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => ImageView(
-                                                    images: state.place.images
-                                                        .map((img) => img.bytes)
-                                                        .toList(),
-                                                    initialIndex: i))));
-                                  }))),
-                      InfoSection(state: state),
-                      MapSection(location: state.place.location),
-                      state.place.ratings
-                              .any((rating) => rating.creatorId == userId)
-                          ? SliverToBoxAdapter(child: SizedBox.shrink())
-                          : AddReviewSection(place: state.place),
-                      RatingsSection(ratings: state.place.ratings),
-                    ]));
-          }
-        }));
+            builder: (context, state) => Scaffold(
+                floatingActionButton: state.place == null
+                    ? null
+                    : FloatingActionButton(
+                        onPressed: () {
+                          openMapsSheet(context, state.place);
+                        },
+                        child: Icon(Icons.navigation)),
+                body: state.place == null
+                    ? Center(child: CircularProgressIndicator())
+                    : CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        slivers: [
+                            SliverAppBar(
+                                title: Text(state.place.name),
+                                snap: true,
+                                floating: true,
+                                pinned: true,
+                                expandedHeight: 200,
+                                flexibleSpace: FlexibleSpaceBar(
+                                    background: PageView.builder(
+                                        itemCount:
+                                            state.place.images?.length ?? 0,
+                                        controller: PageController(),
+                                        itemBuilder: (_, i) {
+                                          return GestureDetector(
+                                              child: Positioned.fill(
+                                                  child: Image.memory(
+                                                state.place.images[i].bytes,
+                                                fit: BoxFit.fill,
+                                              )),
+                                              onTap: () => Navigator.of(context)
+                                                  .push(MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ImageView(
+                                                              images: state
+                                                                  .place.images
+                                                                  .map((img) =>
+                                                                      img.bytes)
+                                                                  .toList(),
+                                                              initialIndex:
+                                                                  i))));
+                                        }))),
+                            InfoSection(state: state),
+                            MapSection(location: state.place.location),
+                            state.showAddRating
+                                ? AddReviewSection(place: state.place)
+                                : SliverToBoxAdapter(child: SizedBox.shrink()),
+                            RatingsSection(ratings: state.place.ratings),
+                          ]))));
   }
 
   openMapsSheet(context, Place place) async {
@@ -120,15 +121,15 @@ class InfoSection extends StatelessWidget {
     return SliverList(
         delegate: SliverChildListDelegate(<Widget>[
       ListTile(
-        title: Text(state.street),
+        title: Text(state.street ?? ""),
         leading: Icon(Icons.location_on),
       ),
       ListTile(
-        title: Text(state.city),
+        title: Text(state.city ?? ""),
         leading: Icon(Icons.location_city),
       ),
       ListTile(
-        title: Text(state.region),
+        title: Text(state.region ?? ""),
         leading: Icon(Icons.satellite),
       ),
       ListTile(

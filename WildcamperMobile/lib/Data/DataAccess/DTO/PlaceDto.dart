@@ -2,11 +2,13 @@ import 'dart:convert';
 
 class PlaceDto {
   int placeId;
-  int creatorId;
+  String creatorId;
   String name;
   String description;
   double latitude;
   double longitude;
+  String thumbnail;
+  int placeTypeId;
   PlaceDto({
     this.placeId,
     this.creatorId,
@@ -14,15 +16,19 @@ class PlaceDto {
     this.description,
     this.latitude,
     this.longitude,
+    this.thumbnail,
+    this.placeTypeId,
   });
 
   PlaceDto copyWith({
     int placeId,
-    int creatorId,
+    String creatorId,
     String name,
     String description,
     double latitude,
     double longitude,
+    String thumbnail,
+    int placeTypeId,
   }) {
     return PlaceDto(
       placeId: placeId ?? this.placeId,
@@ -31,6 +37,8 @@ class PlaceDto {
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      thumbnail: thumbnail ?? this.thumbnail,
+      placeTypeId: placeTypeId ?? this.placeTypeId,
     );
   }
 
@@ -42,6 +50,8 @@ class PlaceDto {
       'Description': description,
       'Latitude': latitude,
       'Longitude': longitude,
+      'Thumbnail': thumbnail,
+      'PlaceTypeId': placeTypeId,
     };
     if (placeId == null) obj.remove('PlaceId');
     return obj;
@@ -57,6 +67,8 @@ class PlaceDto {
       description: map['Description'],
       latitude: map['Latitude'],
       longitude: map['Longitude'],
+      thumbnail: map['Thumbnail'],
+      placeTypeId: map['PlaceTypeId'],
     );
   }
 
@@ -67,7 +79,7 @@ class PlaceDto {
 
   @override
   String toString() {
-    return 'PlaceDto(placeId: $placeId, creatorId: $creatorId, name: $name, description: $description, latitude: $latitude, longitude: $longitude)';
+    return 'PlaceDto(placeId: $placeId, creatorId: $creatorId, name: $name, description: $description, latitude: $latitude, longitude: $longitude, thumbnail: $thumbnail, placeTypeId: $placeTypeId)';
   }
 
   @override
@@ -80,7 +92,9 @@ class PlaceDto {
         o.name == name &&
         o.description == description &&
         o.latitude == latitude &&
-        o.longitude == longitude;
+        o.longitude == longitude &&
+        o.thumbnail == thumbnail &&
+        o.placeTypeId == placeTypeId;
   }
 
   @override
@@ -90,6 +104,8 @@ class PlaceDto {
         name.hashCode ^
         description.hashCode ^
         latitude.hashCode ^
-        longitude.hashCode;
+        longitude.hashCode ^
+        thumbnail.hashCode ^
+        placeTypeId.hashCode;
   }
 }

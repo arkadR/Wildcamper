@@ -1,11 +1,18 @@
+import 'package:WildcamperMobile/Domain/repositories/IUsersRepository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'LoginScreenEvent.dart';
 import 'LoginScreenState.dart';
 
 class LoginScreenBloc extends Bloc<LoginScreenEvent, LoginScreenState> {
   LoginScreenBloc() : super(LoginScreenState.initial());
+
+  final IUsersRepository _usersRepository = GetIt.instance<IUsersRepository>();
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn.standard();
 
   @override
   Stream<LoginScreenState> mapEventToState(LoginScreenEvent event) async* {
@@ -26,6 +33,22 @@ class LoginScreenBloc extends Bloc<LoginScreenEvent, LoginScreenState> {
         yield state.copyWith(errorText: _mapFirebaseErrorToMessage(e));
       }
     }
+    if (event is LoginWithGoogleClicked) {
+      try {
+        final googleUser = await _googleSignIn.signIn();
+        final googleAuth = await googleUser.authentication;
+        final credential = await FirebaseAuth.instance
+            .signInWithCredential(GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        ));
+        var user = credential.user;
+        await _usersRepository.addUser(user.uid, user.email, user.displayName);
+        yield state.copyWith(user: user);
+      } on FirebaseAuthException catch (e) {
+        yield state.copyWith(errorText: _mapFirebaseErrorToMessage(e));
+      }
+    }
 
     if (event is RegisterButtonClicked) {
       if (state.isValid == false) throw new Exception("Bad login form state");
@@ -33,6 +56,8 @@ class LoginScreenBloc extends Bloc<LoginScreenEvent, LoginScreenState> {
         var userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: state.email, password: state.password);
+        var user = userCredential.user;
+        await _usersRepository.addUser(user.uid, user.email, user.displayName);
         yield state.copyWith(user: userCredential.user);
       } on FirebaseAuthException catch (e) {
         yield state.copyWith(errorText: _mapFirebaseErrorToMessage(e));

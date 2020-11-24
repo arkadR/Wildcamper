@@ -1,3 +1,4 @@
+import 'package:WildcamperMobile/Domain/repositories/IPlaceTypeRepository.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
@@ -11,10 +12,17 @@ import 'AddPlaceScreenState.dart';
 class AddPlaceScreenBloc
     extends Bloc<AddPlaceScreenEvent, AddPlaceScreenState> {
   AddPlaceScreenBloc({@required this.location})
-      : super(AddPlaceScreenState.initial());
+      : super(AddPlaceScreenState.initial()) {
+    _placeTypesRepository
+        .getPlaceTypes()
+        .then((types) => add(PlaceTypesLoaded(types)));
+  }
 
   final IPlacesRepository _placesRepository =
       GetIt.instance<IPlacesRepository>();
+
+  final IPlaceTypeRepository _placeTypesRepository =
+      GetIt.instance<IPlaceTypeRepository>();
   final _picker = ImagePicker();
 
   final LatLng location;
@@ -22,12 +30,22 @@ class AddPlaceScreenBloc
   @override
   Stream<AddPlaceScreenState> mapEventToState(
       AddPlaceScreenEvent event) async* {
+    if (event is PlaceTypesLoaded) {
+      yield state.copyWith(
+          availablePlaceTypes: event.placeTypes,
+          selectedPlaceType: event.placeTypes.first);
+    }
     if (event is NameChanged) {
-      var isValid = _validate(event.name, state.imagePaths);
-      yield state.copyWith(name: event.name, isValid: isValid);
+      var name = event.name.padRight(50);
+      var isValid = _validate(name, state.imagePaths);
+      yield state.copyWith(name: name, isValid: isValid);
     }
     if (event is DescriptionChanged) {
-      yield state.copyWith(description: event.description);
+      var description = event.description.padRight(50);
+      yield state.copyWith(description: description);
+    }
+    if (event is PlaceTypeChanged) {
+      yield state.copyWith(selectedPlaceType: event.placeType);
     }
     if (event is SaveButtonClicked) {
       final isValid = _validate(state.name, state.imagePaths);
@@ -36,8 +54,8 @@ class AddPlaceScreenBloc
 
       yield state.copyWith(loadingStatus: AddPlaceScreenFormStatus.loading);
 
-      await _placesRepository.addPlace(
-          state.name, state.description, location, state.imagePaths);
+      await _placesRepository.addPlace(state.name, state.description, location,
+          state.imagePaths, state.selectedPlaceType.placeTypeId);
       yield state.copyWith(loadingStatus: AddPlaceScreenFormStatus.done);
       // Navigator.pop(context);
     }

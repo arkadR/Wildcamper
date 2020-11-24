@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 
 class User {
-  int userId;
+  String userId;
   String firstName;
   String lastName;
   String email;
@@ -19,7 +19,7 @@ class User {
   });
 
   User copyWith({
-    int userId,
+    String userId,
     String firstName,
     String lastName,
     String email,

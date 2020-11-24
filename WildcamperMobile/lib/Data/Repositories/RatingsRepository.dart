@@ -9,7 +9,7 @@ class RatingsRepository extends IRatingsRepository {
 
   @override
   Future<int> addRating(
-      int userId, int placeId, String comment, int stars) async {
+      String userId, int placeId, String comment, int stars) async {
     var dto = RatingDto(
         creatorId: userId, placeId: placeId, comment: comment, stars: stars);
     var ratingId = await _ratingsDataAccess.addReview(dto);

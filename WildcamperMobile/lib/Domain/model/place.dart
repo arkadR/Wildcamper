@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:WildcamperMobile/Data/DataAccess/DTO/ImageDto.dart';
 import 'package:WildcamperMobile/Data/DataAccess/DTO/RatingDto.dart';
 import 'package:WildcamperMobile/Domain/model/image.dart';
@@ -10,13 +13,23 @@ import 'Rating.dart';
 
 class Place {
   int placeId;
-  int creatorId;
+  String creatorId;
   String name;
   String description;
   List<Rating> ratings;
   List<Image> images;
   LatLng location;
   Placemark placemark;
+  Uint8List thumbnail;
+  int placeTypeId;
+
+  double get averageRating {
+    if (ratings?.isEmpty ?? true) return 0;
+    return ratings
+            .map((r) => r.stars.toDouble())
+            .reduce((value, element) => value + element) /
+        ratings.length.toDouble();
+  }
 
   Place(
       {this.placeId,
@@ -26,7 +39,9 @@ class Place {
       this.location,
       this.images,
       this.ratings,
-      this.placemark});
+      this.placemark,
+      this.thumbnail,
+      this.placeTypeId});
 
   factory Place.fromDto(PlaceDto dto,
       {List<ImageDto> imageDtos,
@@ -35,11 +50,13 @@ class Place {
     return Place(
         placeId: dto.placeId,
         creatorId: dto.creatorId,
+        placeTypeId: dto.placeTypeId,
         name: dto.name,
         description: dto.description,
         location: LatLng(dto.latitude, dto.longitude),
         images: imageDtos?.map((img) => Image.fromDto(img))?.toList(),
         ratings: ratingDtos?.map((rtg) => Rating.fromDto(rtg))?.toList(),
-        placemark: placemark);
+        placemark: placemark,
+        thumbnail: base64Decode(dto.thumbnail));
   }
 }

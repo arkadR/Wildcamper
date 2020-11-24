@@ -2,11 +2,17 @@ import 'package:WildcamperMobile/App/Firebase/FirebaseBloc.dart';
 import 'package:WildcamperMobile/App/Authentication/LoginScreen.dart';
 import 'package:WildcamperMobile/App/main_screen.dart';
 import 'package:WildcamperMobile/Data/DataAccess/ImagesDataAccess.dart';
+import 'package:WildcamperMobile/Data/DataAccess/PlaceTypeDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/PlacesDataAccess.dart';
 import 'package:WildcamperMobile/Data/DataAccess/RatingsDataAccess.dart';
+import 'package:WildcamperMobile/Data/DataAccess/UsersDataAccess.dart';
+import 'package:WildcamperMobile/Data/Repositories/PlaceTypeRepository.dart';
 import 'package:WildcamperMobile/Data/Repositories/PlacesRepository.dart';
 import 'package:WildcamperMobile/Data/Repositories/RatingsRepository.dart';
+import 'package:WildcamperMobile/Data/Repositories/UsersRepository.dart';
+import 'package:WildcamperMobile/Domain/repositories/IPlaceTypeRepository.dart';
 import 'package:WildcamperMobile/Domain/repositories/IRatingsRepository.dart';
+import 'package:WildcamperMobile/Domain/repositories/IUsersRepository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +22,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'App/Firebase/FirebaseState.dart';
 import 'Domain/repositories/places_repository.dart';
+import 'Infrastructure/ApiClient.dart';
+import 'Infrastructure/UserProvider.dart';
 
 final getIt = GetIt.instance;
 
@@ -26,11 +34,25 @@ void setupGetIt() {
     client.badCertificateCallback = (cert, host, port) => true;
   };
   getIt.registerSingleton<Dio>(dio);
+  getIt.registerSingleton<ApiClient>(ApiClient());
+  getIt.registerFactory<UserProvider>(() => UserProvider());
+  bindDataAccess();
+  bindRepositories();
+}
+
+void bindDataAccess() {
+  getIt.registerSingleton<UsersDataAccess>(UsersDataAccess());
+  getIt.registerSingleton<PlaceTypeDataAccess>(PlaceTypeDataAccess());
   getIt.registerSingleton<PlacesDataAccess>(PlacesDataAccess());
   getIt.registerSingleton<ImagesDataAccess>(ImagesDataAccess());
   getIt.registerSingleton<RatingsDataAccess>(RatingsDataAccess());
+}
+
+void bindRepositories() {
+  getIt.registerSingleton<IPlaceTypeRepository>(PlaceTypeRepository());
   getIt.registerSingleton<IPlacesRepository>(PlacesRepository());
   getIt.registerSingleton<IRatingsRepository>(RatingsRepository());
+  getIt.registerSingleton<IUsersRepository>(UsersRepository());
   getIt.registerSingletonAsync<SharedPreferences>(
       () async => await SharedPreferences.getInstance());
 }

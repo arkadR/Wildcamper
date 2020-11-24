@@ -6,7 +6,7 @@ import 'package:WildcamperMobile/Data/DataAccess/DTO/ImageDto.dart';
 class Image {
   int photoId;
   int placeId;
-  int creatorId;
+  String creatorId;
   Uint8List bytes;
   Image({
     this.photoId,

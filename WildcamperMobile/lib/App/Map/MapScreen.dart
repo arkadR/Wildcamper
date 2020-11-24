@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'MapScreenState.dart';
+import 'PlacePreview.dart';
 
 class MapSample extends StatelessWidget {
   @override
@@ -14,40 +15,48 @@ class MapSample extends StatelessWidget {
 
     return BlocProvider<MapScreenBloc>(
         create: (context) => MapScreenBloc(),
-        child: BlocBuilder<MapScreenBloc, MapScreenState>(
-            builder: (context, state) {
-          return GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition:
-                  CameraPosition(target: LatLng(0, 0), zoom: state.currentZoom),
-              onMapCreated: (controller) =>
-                  bloc(context).add(MapLoaded(controller: controller)),
-              myLocationEnabled: true,
-              compassEnabled: true,
-              myLocationButtonEnabled: true,
-              markers: state.markers.toSet(),
-              onCameraMove: (position) =>
-                  bloc(context).add(CameraMoved(cameraPosition: position)),
-              onLongPress: (latLng) => showDialog(
+        child: BlocListener<MapScreenBloc, MapScreenState>(
+            listenWhen: (previousState, state) =>
+                previousState.tappedPlace != state.tappedPlace,
+            listener: (context, state) {
+              showModalBottomSheet<void>(
                   context: context,
-                  builder: (dialogContext) => AlertDialog(
-                        title:
-                            Text("Do you want to add a marker at this place?"),
-                        actions: [
-                          FlatButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              child: Text("Cancel")),
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                                Navigator.of(context)
-                                    .push(_createAddPlaceRoute(latLng));
-                              },
-                              child: Text("Yes"))
-                        ],
-                      ),
-                  barrierDismissible: false));
-        }));
+                  builder: (context) => PlacePreview(place: state.tappedPlace));
+            },
+            child: BlocBuilder<MapScreenBloc, MapScreenState>(
+                builder: (context, state) {
+              return GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(0, 0), zoom: state.currentZoom),
+                  onMapCreated: (controller) =>
+                      bloc(context).add(MapLoaded(controller: controller)),
+                  myLocationEnabled: true,
+                  compassEnabled: true,
+                  myLocationButtonEnabled: true,
+                  markers: state.markers.toSet(),
+                  onCameraMove: (position) =>
+                      bloc(context).add(CameraMoved(cameraPosition: position)),
+                  onLongPress: (latLng) => showDialog(
+                      context: context,
+                      builder: (dialogContext) => AlertDialog(
+                            title: Text(
+                                "Do you want to add a marker at this place?"),
+                            actions: [
+                              FlatButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: Text("Cancel")),
+                              FlatButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogContext);
+                                    Navigator.of(context)
+                                        .push(_createAddPlaceRoute(latLng));
+                                  },
+                                  child: Text("Yes"))
+                            ],
+                          ),
+                      barrierDismissible: false));
+            })));
   }
 
   //TODO: This does not work (async dispose)

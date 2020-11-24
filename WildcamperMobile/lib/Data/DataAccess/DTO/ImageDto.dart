@@ -3,7 +3,7 @@ import 'dart:convert';
 class ImageDto {
   int imageId;
   int placeId;
-  int creatorId;
+  String creatorId;
   String bytes;
   ImageDto({
     this.imageId,
@@ -15,7 +15,7 @@ class ImageDto {
   ImageDto copyWith({
     int photoId,
     int placeId,
-    int creatorId,
+    String creatorId,
     String bytes,
   }) {
     return ImageDto(

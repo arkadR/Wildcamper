@@ -1,5 +1,5 @@
-import 'package:WildcamperMobile/App/MyPlaces/my_places_screen.dart';
-import 'package:WildcamperMobile/App/Search/search_screen.dart';
+import 'package:WildcamperMobile/App/MyPlaces/MyPlacesScreen.dart';
+import 'package:WildcamperMobile/App/Search/SearchScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

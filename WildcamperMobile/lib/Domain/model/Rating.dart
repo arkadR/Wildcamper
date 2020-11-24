@@ -2,7 +2,7 @@ import 'package:WildcamperMobile/Data/DataAccess/DTO/RatingDto.dart';
 
 class Rating {
   int ratingId;
-  int creatorId;
+  String creatorId;
   int placeId;
   String comment;
   int stars;

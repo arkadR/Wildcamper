@@ -34,7 +34,7 @@ dependencies:
   bloc: ^6.1.0
   flutter_bloc: ^6.1.0
   location: ^3.0.2
-  equatable: ^1.2.3
+  equatable: ^1.2.5
   shared_preferences: ^0.5.12+2
   json_annotation: ^3.1.0
   dio: ^3.0.10
@@ -49,6 +49,7 @@ dependencies:
   geolocator: ^6.1.6
   shimmer: ^1.1.2
   flutter_rating_bar: ^3.2.0
+  google_sign_in: ^4.5.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -59,7 +60,14 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.10.4
   json_serializable: ^3.5.0
+  flutter_launcher_icons: "^0.8.0"
 
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#ff4caf50"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

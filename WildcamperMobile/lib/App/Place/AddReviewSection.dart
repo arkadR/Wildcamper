@@ -1,5 +1,5 @@
 import 'package:WildcamperMobile/App/Place/bloc/AddReviewSectionEvent.dart';
-import 'package:WildcamperMobile/Domain/model/place.dart';
+import 'package:WildcamperMobile/Domain/model/Place.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
