@@ -18,4 +18,12 @@ class UsersDataAccess {
       if (e.response.statusCode != HttpStatus.conflict) rethrow;
     }
   }
+
+  Future<List<UserDto>> getUsers() async {
+    var response = await _apiClient.get("odata/users");
+    var users = (response.data["value"] as List)
+        .map((obj) => UserDto.fromMap(obj))
+        .toList();
+    return users;
+  }
 }

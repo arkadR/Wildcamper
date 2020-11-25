@@ -1,37 +1,36 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 class User {
   String userId;
-  String firstName;
-  String lastName;
+  String displayName;
   String email;
-  String nickname;
   List<int> createdPlacesIds;
   User({
     this.userId,
-    this.firstName,
-    this.lastName,
+    this.displayName,
     this.email,
-    this.nickname,
     this.createdPlacesIds,
   });
 
+  String get displayedName {
+    if (displayName != null) return displayName;
+    if (email != null) return email;
+    return userId;
+  }
+
   User copyWith({
     String userId,
-    String firstName,
-    String lastName,
+    String displayName,
     String email,
-    String nickname,
     List<int> createdPlacesIds,
   }) {
     return User(
       userId: userId ?? this.userId,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
+      displayName: displayName ?? this.displayName,
       email: email ?? this.email,
-      nickname: nickname ?? this.nickname,
       createdPlacesIds: createdPlacesIds ?? this.createdPlacesIds,
     );
   }
@@ -39,10 +38,8 @@ class User {
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
-      'firstName': firstName,
-      'lastName': lastName,
+      'displayName': displayName,
       'email': email,
-      'nickname': nickname,
       'createdPlacesIds': createdPlacesIds,
     };
   }
@@ -52,10 +49,8 @@ class User {
 
     return User(
       userId: map['userId'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
+      displayName: map['displayName'],
       email: map['email'],
-      nickname: map['nickname'],
       createdPlacesIds: List<int>.from(map['createdPlacesIds']),
     );
   }
@@ -66,30 +61,25 @@ class User {
 
   @override
   String toString() {
-    return 'User(userId: $userId, firstName: $firstName, lastName: $lastName, email: $email, nickname: $nickname, createdPlacesIds: $createdPlacesIds)';
+    return 'User(userId: $userId, displayName: $displayName, email: $email, createdPlacesIds: $createdPlacesIds)';
   }
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
-    final listEquals = const DeepCollectionEquality().equals;
 
     return o is User &&
         o.userId == userId &&
-        o.firstName == firstName &&
-        o.lastName == lastName &&
+        o.displayName == displayName &&
         o.email == email &&
-        o.nickname == nickname &&
         listEquals(o.createdPlacesIds, createdPlacesIds);
   }
 
   @override
   int get hashCode {
     return userId.hashCode ^
-        firstName.hashCode ^
-        lastName.hashCode ^
+        displayName.hashCode ^
         email.hashCode ^
-        nickname.hashCode ^
         createdPlacesIds.hashCode;
   }
 }

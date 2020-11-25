@@ -4,12 +4,14 @@ import 'package:equatable/equatable.dart';
 
 import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceTypeDto.dart';
 
+import '../FormStatus.dart';
+
 class AddPlaceScreenState extends Equatable {
   final String name;
   final String description;
   final List<String> imagePaths;
   final bool isValid;
-  final AddPlaceScreenFormStatus loadingStatus;
+  final FormStatus loadingStatus;
   final List<PlaceTypeDto> availablePlaceTypes;
   final PlaceTypeDto selectedPlaceType;
   AddPlaceScreenState({
@@ -28,7 +30,7 @@ class AddPlaceScreenState extends Equatable {
         description: "",
         isValid: false,
         imagePaths: List(),
-        loadingStatus: AddPlaceScreenFormStatus.invalid,
+        loadingStatus: FormStatus.invalid,
         availablePlaceTypes: List(),
         selectedPlaceType: null);
   }
@@ -38,7 +40,7 @@ class AddPlaceScreenState extends Equatable {
     String description,
     List<String> imagePaths,
     bool isValid,
-    AddPlaceScreenFormStatus loadingStatus,
+    FormStatus loadingStatus,
     List<PlaceTypeDto> availablePlaceTypes,
     PlaceTypeDto selectedPlaceType,
   }) {
@@ -102,5 +104,3 @@ class AddPlaceScreenState extends Equatable {
     ];
   }
 }
-
-enum AddPlaceScreenFormStatus { invalid, valid, loading, done }

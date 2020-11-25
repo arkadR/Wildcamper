@@ -12,13 +12,15 @@ import 'package:geocoding/geocoding.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../Infrastructure/Extensions/PlacemarkExtensions.dart';
+
 class PlacesRepository extends IPlacesRepository {
   final PlacesDataAccess _placesDataAccess = PlacesDataAccess();
   final ImagesDataAccess _imagesDataAccess = GetIt.instance<ImagesDataAccess>();
   final UserProvider _userProvider = GetIt.instance<UserProvider>();
   String get userId => _userProvider.getCurrentUser().uid;
-  final _targetWidth = 100;
-  final _thumbnailWidth = 50;
+  final _targetWidth = 720;
+  final _thumbnailWidth = 200;
 
   List<Place> _partLoadedPlaces = null;
   List<Place> _fullyLoadedPlaces = List();
@@ -32,14 +34,14 @@ class PlacesRepository extends IPlacesRepository {
   @override
   Future<List<Place>> getMyPlaces() async {
     _ensurePlacesLoaded();
-    // var myPlacesIds = _partLoadedPlaces
-    //     .where((place) => place.creatorId == userId)
-    //     .map((place) => place.placeId);
-    // if (myPlacesIds.any((id) =>
-    //     _fullyLoadedPlaces.where((place) => place.placeId == id).isEmpty)) {
-    //   await _loadMyPlaces();
-    // }
-    return _partLoadedPlaces
+    var myPlacesIds = _partLoadedPlaces
+        .where((place) => place.creatorId == userId)
+        .map((place) => place.placeId);
+    if (myPlacesIds.any((id) =>
+        _fullyLoadedPlaces.where((place) => place.placeId == id).isEmpty)) {
+      await _loadMyPlaces();
+    }
+    return _fullyLoadedPlaces
         .where((place) => place.creatorId == userId)
         .toList();
   }
@@ -60,6 +62,7 @@ class PlacesRepository extends IPlacesRepository {
     var model = Place.fromDto(placeDto,
         imageDtos: imageDtos, ratingDtos: ratingDtos, placemark: placemark);
 
+    _fullyLoadedPlaces.removeWhere((place) => place.placeId == id);
     _fullyLoadedPlaces.add(model);
     _partLoadedPlaces.removeWhere((place) => place.placeId == id);
     _partLoadedPlaces.add(model);
@@ -73,25 +76,27 @@ class PlacesRepository extends IPlacesRepository {
     _partLoadedPlaces = models;
   }
 
-  // Future<void> _loadMyPlaces() async {
-  //   var result = await _placesDataAccess.getUserPlaces(userId);
-  //   var places = result.map((tuple) async {
-  //     var placemark =
-  //         await getPlaceMark(tuple.item1.latitude, tuple.item1.longitude);
-  //     return Place.fromDto(tuple.item1,
-  //         imageDtos: tuple.item2,
-  //         ratingDtos: tuple.item3,
-  //         placemark: placemark);
-  //   });
-  //   var models = await Future.wait(places);
-  //   _fullyLoadedPlaces.removeWhere((place) => place.creatorId == userId);
-  //   _fullyLoadedPlaces.addAll(models);
-  // }
+  Future<void> _loadMyPlaces() async {
+    var result = await _placesDataAccess.getUserPlaces(userId);
+    var places = result.map((tuple) async {
+      var placemark =
+          await getPlaceMark(tuple.item1.latitude, tuple.item1.longitude);
+      return Place.fromDto(tuple.item1,
+          imageDtos: tuple.item2,
+          ratingDtos: tuple.item3,
+          placemark: placemark);
+    });
+    var models = await Future.wait(places);
+    _fullyLoadedPlaces.removeWhere((place) => place.creatorId == userId);
+    _fullyLoadedPlaces.addAll(models);
+  }
 
   @override
   Future addPlace(String name, String description, LatLng location,
       Iterable<String> photoPaths, int placeTypeId) async {
     var content = await base64Image(photoPaths.first, 90, _thumbnailWidth);
+
+    var placemark = await getPlaceMark(location.latitude, location.longitude);
 
     var placeDto = PlaceDto(
         creatorId: userId,
@@ -100,7 +105,10 @@ class PlacesRepository extends IPlacesRepository {
         longitude: location.longitude,
         name: name,
         thumbnail: content,
-        placeTypeId: placeTypeId);
+        placeTypeId: placeTypeId,
+        country: placemark.country,
+        city: placemark.city,
+        region: placemark.region);
 
     var placeId = await _placesDataAccess.addPlace(placeDto);
 
@@ -114,12 +122,15 @@ class PlacesRepository extends IPlacesRepository {
     for (var image in imageDtos) {
       await _imagesDataAccess.addImage(image);
     }
+    await _ensurePlacesLoaded(force: true);
     await getPlaceById(placeId, force: true);
   }
 
   @override
   Future removePlace(Place place) async {
     await _placesDataAccess.removePlace(place.placeId);
+    _fullyLoadedPlaces
+        .removeWhere((element) => element.placeId == place.placeId);
     await _ensurePlacesLoaded(force: true);
   }
 
@@ -141,5 +152,25 @@ class PlacesRepository extends IPlacesRepository {
     var bytes = await file.readAsBytes();
     var content = base64Encode(bytes);
     return content;
+  }
+
+  @override
+  Future updatePlace(int placeId, String title, String description,
+      List<int> removedImageIds, List<String> addedImagePaths) async {
+    removedImageIds
+        .forEach((id) async => await _imagesDataAccess.deleteImage(id));
+    var imageDtos = List<ImageDto>();
+    for (var path in addedImagePaths) {
+      var content = await base64Image(path, 90, _targetWidth);
+      var dto = ImageDto(bytes: content, creatorId: userId, placeId: placeId);
+      imageDtos.add(dto);
+    }
+
+    for (var image in imageDtos) {
+      await _imagesDataAccess.addImage(image);
+    }
+    await _placesDataAccess.updatePlace(placeId, title, description);
+    await getPlaceById(placeId, force: true);
+    await _ensurePlacesLoaded(force: true);
   }
 }

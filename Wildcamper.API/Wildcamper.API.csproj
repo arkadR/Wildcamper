@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20201112115343_RemovedUserNames.cs" />
+    <Compile Remove="Migrations\20201112115343_RemovedUserNames.Designer.cs" />
+    <Compile Remove="Migrations\20201123163419_UpdatedPlace.cs" />
+    <Compile Remove="Migrations\20201123163419_UpdatedPlace.Designer.cs" />
+    <Compile Remove="Migrations\20201124113203_AddedStaticData.cs" />
+    <Compile Remove="Migrations\20201124113203_AddedStaticData.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.9" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.5.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
@@ -24,10 +33,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.8.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 

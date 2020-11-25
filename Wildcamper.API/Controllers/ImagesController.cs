@@ -41,6 +41,16 @@ namespace Wildcamper.API.Controllers
       return Created(new Uri($"{Request.Path}/{model.ImageId}", UriKind.Relative), model);
     }
 
+    public async Task<IActionResult> Delete([FromODataUri] int key)
+    {
+      var image = await _context.Image.FindAsync(key);
+      if (image == null)
+        return NotFound();
+
+      _context.Image.Remove(image);
+      await _context.SaveChangesAsync();
+      return NoContent();
+    }
     // // GET: api/Images/5
     // [HttpGet("{id}")]
     // public async Task<ActionResult<Images>> GetImage(int id)

@@ -6,8 +6,11 @@ import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../FormStatus.dart';
 import 'AddPlaceScreenEvent.dart';
 import 'AddPlaceScreenState.dart';
+
+import '../../Infrastructure/Extensions/StringExtensions.dart';
 
 class AddPlaceScreenBloc
     extends Bloc<AddPlaceScreenEvent, AddPlaceScreenState> {
@@ -36,12 +39,12 @@ class AddPlaceScreenBloc
           selectedPlaceType: event.placeTypes.first);
     }
     if (event is NameChanged) {
-      var name = event.name.padRight(50);
+      var name = event.name.truncateTo(50);
       var isValid = _validate(name, state.imagePaths);
       yield state.copyWith(name: name, isValid: isValid);
     }
     if (event is DescriptionChanged) {
-      var description = event.description.padRight(50);
+      var description = event.description.truncateTo(500);
       yield state.copyWith(description: description);
     }
     if (event is PlaceTypeChanged) {
@@ -52,11 +55,11 @@ class AddPlaceScreenBloc
       if (isValid == false)
         throw Exception("Form was submitted in a bad state");
 
-      yield state.copyWith(loadingStatus: AddPlaceScreenFormStatus.loading);
+      yield state.copyWith(loadingStatus: FormStatus.loading);
 
       await _placesRepository.addPlace(state.name, state.description, location,
           state.imagePaths, state.selectedPlaceType.placeTypeId);
-      yield state.copyWith(loadingStatus: AddPlaceScreenFormStatus.done);
+      yield state.copyWith(loadingStatus: FormStatus.done);
       // Navigator.pop(context);
     }
     if (event is AddImageButtonClicked) {
@@ -66,8 +69,7 @@ class AddPlaceScreenBloc
         var isValid = _validate(state.name, imagePaths);
         yield state.copyWith(
             imagePaths: imagePaths,
-            loadingStatus:
-                isValid ? AddPlaceScreenFormStatus.valid : state.loadingStatus);
+            loadingStatus: isValid ? FormStatus.valid : state.loadingStatus);
       }
     }
   }

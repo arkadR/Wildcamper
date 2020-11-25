@@ -38,6 +38,16 @@ namespace Wildcamper.API.Controllers
       await _context.SaveChangesAsync();
       return Created(new Uri($"{Request.Path}/{model.RatingId}", UriKind.Relative), model);
     }
+    public async Task<IActionResult> Delete([FromODataUri] int key)
+    {
+      var rating = await _context.Rating.FindAsync(key);
+      if (rating == null)
+        return NotFound();
+
+      _context.Rating.Remove(rating);
+      await _context.SaveChangesAsync();
+      return NoContent();
+    }
   }
 
 }

@@ -52,6 +52,11 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
     if (event is CameraMoved) {
       _awaitingCameraChange = false;
     }
+    if (event is PlaceLoadRequested) {
+      _placesRepository
+          .getAllPlaces()
+          .then((places) => add(PlacesLoaded(places: places)));
+    }
     if (event is PlacesLoaded) {
       var campsiteIcon = await _campsiteIconBitmap.future;
       var wildcampingIcon = await _wildIconBitmap.future;

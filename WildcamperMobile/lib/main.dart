@@ -16,6 +16,7 @@ import 'package:WildcamperMobile/Domain/repositories/IUsersRepository.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,10 +67,12 @@ void main() {
 class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    debugPaintSizeEnabled = false;
     return BlocProvider<FirebaseBloc>(
         create: (context) => FirebaseBloc(),
         child: BlocBuilder<FirebaseBloc, FirebaseState>(
             builder: (context, state) => MaterialApp(
+                debugShowCheckedModeBanner: false,
                 title: 'Wildcamper',
                 theme: ThemeData(
                   primarySwatch: Colors.green,

@@ -8,9 +8,11 @@ namespace Wildcamper.API.Models
   {
     public int RatingId { get; set; }
     public int PlaceId { get; set; }
-    public int CreatorId { get; set; }
+    public string CreatorId { get; set; }
     public string Comment { get; set; }
     public int Stars { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
     [JsonIgnore]
     public virtual User Creator { get; set; }

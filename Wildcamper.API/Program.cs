@@ -41,36 +41,36 @@ namespace Wildcamper.API
         Log.CloseAndFlush();
       }
     }
-
-    private static void SeedCountries(WildcamperContext context)
-    {
-      context.Add(new User
-      {
-        FirstName = "Arkadiusz",
-        LastName = "Rasz",
-        Login = "ar",
-      });
-      context.SaveChanges();
-
-      context.Place.Add(new Place
-      {
-        CreatorId = context.User.First().UserId,
-        Description = "dsahj",
-        Latitude = 51,
-        Longitude = 17,
-        Name = "Place1"
-      });
-      context.SaveChanges();
-
-      context.Image.Add(new Image
-      {
-        CreatorId = context.User.First().UserId,
-        PlaceId = context.Place.First().PlaceId,
-        Bytes = File.ReadAllBytes("Temp/1.jpg")
-      });
-
-      context.SaveChanges();
-    }
+    //
+    // private static void SeedCountries(WildcamperContext context)
+    // {
+    //   context.Add(new User
+    //   {
+    //     FirstName = "Arkadiusz",
+    //     LastName = "Rasz",
+    //     Login = "ar",
+    //   });
+    //   context.SaveChanges();
+    //
+    //   context.Place.Add(new Place
+    //   {
+    //     CreatorId = context.User.First().UserId,
+    //     Description = "dsahj",
+    //     Latitude = 51,
+    //     Longitude = 17,
+    //     Name = "Place1"
+    //   });
+    //   context.SaveChanges();
+    //
+    //   context.Image.Add(new Image
+    //   {
+    //     CreatorId = context.User.First().UserId,
+    //     PlaceId = context.Place.First().PlaceId,
+    //     Bytes = File.ReadAllBytes("Temp/1.jpg")
+    //   });
+    //
+    //   context.SaveChanges();
+    // }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
@@ -79,7 +79,7 @@ namespace Wildcamper.API
             webBuilder
               .UseKestrel()
               .UseSerilog()
-              .UseUrls("https://localhost:44310", "https://192.168.0.102:44310", "https://pc-arkadr:44310")
+              .UseUrls("https://localhost:44310", "https://192.168.0.103:44310", "https://pc-arkadr:44310")
               .UseStartup<Startup>();
           });
   }

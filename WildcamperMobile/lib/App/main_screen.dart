@@ -58,8 +58,10 @@ class MainDrawer extends StatelessWidget {
                 child: Column(
                   children: [
                     Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(state.user.getDisplayName())),
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          state.user.getDisplayName(),
+                        )),
                     Expanded(
                         child: Align(
                             alignment: Alignment.bottomRight,
@@ -68,8 +70,10 @@ class MainDrawer extends StatelessWidget {
                   ],
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
+                    color: Colors.blue,
+                    image: DecorationImage(
+                        image: AssetImage("assets/background.jpg"),
+                        fit: BoxFit.cover)),
               ),
               ListTile(
                 title: Text('About app'),

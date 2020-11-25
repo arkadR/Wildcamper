@@ -36,6 +36,8 @@ class PlacesLoaded extends MapScreenEvent {
   List<Object> get props => [places];
 }
 
+class PlaceLoadRequested extends MapScreenEvent {}
+
 class CameraMoved extends MapScreenEvent {
   final CameraPosition cameraPosition;
 

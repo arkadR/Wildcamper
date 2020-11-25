@@ -1,7 +1,7 @@
 ﻿using System;
-using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Wildcamper.API.Models
 {
@@ -12,7 +12,7 @@ namespace Wildcamper.API.Models
     }
 
     public WildcamperContext(DbContextOptions<WildcamperContext> options)
-        : base(options)
+      : base(options)
     {
     }
 
@@ -20,12 +20,12 @@ namespace Wildcamper.API.Models
     public virtual DbSet<Place> Place { get; set; }
     public virtual DbSet<Rating> Rating { get; set; }
     public virtual DbSet<User> User { get; set; }
+    public virtual DbSet<PlaceType> PlaceType { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
       if (!optionsBuilder.IsConfigured)
       {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
         optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=Wildcamper;Trusted_Connection=True;");
       }
     }
@@ -36,18 +36,19 @@ namespace Wildcamper.API.Models
       {
         entity.Property(e => e.ImageId).ValueGeneratedOnAdd();
 
-        entity.Property(e => e.AddedDate).HasColumnType("date");
+        entity.Property(e => e.CreatedDate).HasColumnType("date");
+        entity.Property(e => e.ModifiedDate).HasColumnType("date");
 
         entity.HasOne(d => d.Creator)
-                  .WithMany(p => p.Image)
-                  .HasForeignKey(d => d.CreatorId)
-                  .HasConstraintName("FK_Image_CreatorId_User_UserId");
+          .WithMany(p => p.Image)
+          .HasForeignKey(d => d.CreatorId)
+          .HasConstraintName("FK_Image_CreatorId_User_UserId");
 
         entity.HasOne(d => d.Place)
-                  .WithMany(p => p.Images)
-                  .HasForeignKey(d => d.PlaceId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_Image_PlaceId_Place_PlaceId");
+          .WithMany(p => p.Images)
+          .HasForeignKey(d => d.PlaceId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_Image_PlaceId_Place_PlaceId");
       });
 
       modelBuilder.Entity<Place>(entity =>
@@ -62,11 +63,20 @@ namespace Wildcamper.API.Models
 
         entity.Property(e => e.Name).HasMaxLength(50);
 
+        entity.Property(e => e.CreatedDate).HasColumnType("date");
+        entity.Property(e => e.ModifiedDate).HasColumnType("date");
+
         entity.HasOne(d => d.Creator)
-                  .WithMany(p => p.Place)
-                  .HasForeignKey(d => d.CreatorId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_Place_CreatorId_User_UserId");
+          .WithMany(p => p.Place)
+          .HasForeignKey(d => d.CreatorId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_Place_CreatorId_User_UserId");
+
+        entity.HasOne(d => d.PlaceType)
+          .WithMany(p => p.Places)
+          .HasForeignKey(d => d.PlaceTypeId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_Place_PlaceTypeId_PlaceType_PlaceTypeId");
       });
 
       modelBuilder.Entity<Rating>(entity =>
@@ -75,35 +85,49 @@ namespace Wildcamper.API.Models
 
         entity.Property(e => e.Comment).HasMaxLength(500);
 
+        entity.Property(e => e.CreatedDate).HasColumnType("date");
+        entity.Property(e => e.ModifiedDate).HasColumnType("date");
+
 
         entity.HasOne(d => d.Creator)
-                  .WithMany(p => p.Rating)
-                  .HasForeignKey(d => d.CreatorId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_Rating_CreatorId_User_UserId");
+          .WithMany(p => p.Rating)
+          .HasForeignKey(d => d.CreatorId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_Rating_CreatorId_User_UserId");
 
         entity.HasOne(d => d.Place)
-                  .WithMany(p => p.Ratings)
-                  .HasForeignKey(d => d.PlaceId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_Rating_PlaceId_Place_PlaceId");
+          .WithMany(p => p.Ratings)
+          .HasForeignKey(d => d.PlaceId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_Rating_PlaceId_Place_PlaceId");
       });
 
       modelBuilder.Entity<User>(entity =>
       {
-        entity.Property(e => e.UserId).ValueGeneratedOnAdd();
+        entity.Property(e => e.CreatedDate).HasColumnType("date");
+        entity.Property(e => e.ModifiedDate).HasColumnType("date");
 
-        entity.Property(e => e.FirstName)
-                  .HasMaxLength(50)
-                  .IsUnicode(false);
+        entity.Property(e => e.DisplayName)
+          .HasMaxLength(50)
+          .IsUnicode(false);
 
-        entity.Property(e => e.LastName)
-                  .HasMaxLength(50)
-                  .IsUnicode(false);
+        entity.Property(e => e.Email)
+          .HasMaxLength(50)
+          .IsUnicode(false);
+      });
 
-        entity.Property(e => e.Login)
-                  .HasMaxLength(50)
-                  .IsUnicode(false);
+      modelBuilder.Entity<PlaceType>(entity =>
+      {
+        entity.Property(e => e.PlaceTypeId).ValueGeneratedOnAdd();
+        entity.Property(e => e.Name).HasMaxLength(50);
+
+        entity.Property(e => e.CreatedDate).HasColumnType("date");
+        entity.Property(e => e.ModifiedDate).HasColumnType("date");
+
+        entity.HasData(
+          new PlaceType {PlaceTypeId = 1, Name = "Campsite", CreatedDate = DateTime.Now, ModifiedDate = DateTime.Now},
+          new PlaceType {PlaceTypeId = 2, Name = "Wild camping spot", CreatedDate = DateTime.Now, ModifiedDate = DateTime.Now });
+
       });
 
       OnModelCreatingPartial(modelBuilder);
@@ -111,5 +135,35 @@ namespace Wildcamper.API.Models
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
+    public override async Task<int> SaveChangesAsync(
+      bool acceptAllChangesOnSuccess,
+      CancellationToken cancellationToken = default
+    )
+    {
+      OnBeforeSaving();
+      return (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
+        cancellationToken));
+    }
+
+    private void OnBeforeSaving()
+    {
+      var entries = ChangeTracker.Entries();
+      var utcNow = DateTime.UtcNow;
+
+      foreach (var entry in entries)
+      {
+        switch (entry.State)
+        {
+          case EntityState.Modified:
+            entry.Property("ModifiedDate").CurrentValue = utcNow;
+            entry.Property("ModifiedDate").IsModified = false;
+            break;
+          case EntityState.Added:
+            entry.Property("CreatedDate").CurrentValue = utcNow;
+            entry.Property("ModifiedDate").CurrentValue = utcNow;
+            break;
+        }
+      }
+    }
   }
 }

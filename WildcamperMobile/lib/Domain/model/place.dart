@@ -19,6 +19,9 @@ class Place {
   List<Rating> ratings;
   List<Image> images;
   LatLng location;
+  String country;
+  String region;
+  String city;
   Placemark placemark;
   Uint8List thumbnail;
   int placeTypeId;
@@ -41,7 +44,10 @@ class Place {
       this.ratings,
       this.placemark,
       this.thumbnail,
-      this.placeTypeId});
+      this.placeTypeId,
+      this.city,
+      this.region,
+      this.country});
 
   factory Place.fromDto(PlaceDto dto,
       {List<ImageDto> imageDtos,
@@ -54,6 +60,9 @@ class Place {
         name: dto.name,
         description: dto.description,
         location: LatLng(dto.latitude, dto.longitude),
+        city: dto.city,
+        region: dto.region,
+        country: dto.country,
         images: imageDtos?.map((img) => Image.fromDto(img))?.toList(),
         ratings: ratingDtos?.map((rtg) => Rating.fromDto(rtg))?.toList(),
         placemark: placemark,

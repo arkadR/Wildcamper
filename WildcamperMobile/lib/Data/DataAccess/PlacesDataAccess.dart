@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:get_it/get_it.dart';
+import 'package:tuple/tuple.dart';
+
 import 'package:WildcamperMobile/Data/DataAccess/DTO/PlaceDto.dart';
 import 'package:WildcamperMobile/Data/DataAccess/DTO/RatingDto.dart';
 import 'package:WildcamperMobile/Infrastructure/ApiClient.dart';
-import 'package:get_it/get_it.dart';
-import 'package:tuple/tuple.dart';
 
 import 'DTO/ImageDto.dart';
 
@@ -58,4 +59,28 @@ class PlacesDataAccess {
   Future removePlace(int placeId) async {
     var response = await _apiClient.delete("odata/places($placeId)");
   }
+
+  Future updatePlace(int placeId, String title, String description) async {
+    var delta = jsonDecode(
+        jsonEncode(PlaceDelta(name: title, description: description)));
+    var response = await _apiClient.patch("odata/places($placeId)", delta);
+  }
+}
+
+class PlaceDelta {
+  String name;
+  String description;
+  PlaceDelta({
+    this.name,
+    this.description,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Name': name,
+      'Description': description,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
 }

@@ -12,4 +12,8 @@ class RatingsDataAccess {
     var response = await _apiClient.post("odata/ratings", body);
     return response.data['RatingId'];
   }
+
+  Future removeRating(int ratingId) async {
+    var response = await _apiClient.delete("odata/ratings($ratingId)");
+  }
 }

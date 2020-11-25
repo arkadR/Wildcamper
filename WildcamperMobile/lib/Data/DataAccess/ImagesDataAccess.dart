@@ -25,4 +25,8 @@ class ImagesDataAccess {
     var response = await _apiClient.post("odata/images", body);
     return response.data['ImageId'];
   }
+
+  Future deleteImage(int imageId) async {
+    var response = await _apiClient.delete("odata/images($imageId)");
+  }
 }

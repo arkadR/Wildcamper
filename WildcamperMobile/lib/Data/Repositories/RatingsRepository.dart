@@ -15,4 +15,9 @@ class RatingsRepository extends IRatingsRepository {
     var ratingId = await _ratingsDataAccess.addReview(dto);
     return ratingId;
   }
+
+  @override
+  Future removeRating(int ratingId) async {
+    await _ratingsDataAccess.removeRating(ratingId);
+  }
 }

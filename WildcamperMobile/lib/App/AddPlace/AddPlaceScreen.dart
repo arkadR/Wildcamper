@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../FormStatus.dart';
 import 'AddPlaceScreenState.dart';
 
 class AddPlaceScreen extends StatelessWidget {
@@ -25,7 +26,7 @@ class AddPlaceScreen extends StatelessWidget {
         create: (context) => AddPlaceScreenBloc(location: location),
         child: BlocListener<AddPlaceScreenBloc, AddPlaceScreenState>(
             listener: (context, state) {
-              if (state.loadingStatus == AddPlaceScreenFormStatus.done) {
+              if (state.loadingStatus == FormStatus.done) {
                 Navigator.pop(context);
               }
             },
@@ -37,80 +38,84 @@ class AddPlaceScreen extends StatelessWidget {
                         _getAppBarAction(context, state.loadingStatus)
                       ],
                     ),
-                    body: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Type: ",
-                              textScaleFactor: 1.2,
-                            ),
-                            state.availablePlaceTypes.isNotEmpty
-                                ? DropdownButton<PlaceTypeDto>(
-                                    value: state.selectedPlaceType,
-                                    items: state.availablePlaceTypes
-                                        .map((type) =>
-                                            DropdownMenuItem<PlaceTypeDto>(
-                                                value: type,
-                                                child: Text(type.name)))
-                                        .toList(),
-                                    onChanged: (value) => bloc(context)
-                                        .add(PlaceTypeChanged(value)))
-                                : SizedBox(),
-                          ],
-                        ),
-                        TextField(
-                            decoration: InputDecoration(
-                                labelText: 'Title',
-                                errorText: state.name.isEmpty
-                                    ? "Please enter a title"
-                                    : null),
-                            maxLength: 50,
-                            maxLengthEnforced: true,
-                            onChanged: (value) =>
-                                bloc(context).add(NameChanged(name: value))),
-                        TextField(
-                            decoration:
-                                InputDecoration(labelText: 'Description'),
-                            maxLength: 500,
-                            onChanged: (value) => bloc(context)
-                                .add(DescriptionChanged(description: value))),
-                        Container(
-                            height: 200, child: MapPreview(location: location)),
-                        SizedBox(height: 30),
-                        Align(
-                            alignment: Alignment.topLeft,
-                            child: Text('Add pictures:', textScaleFactor: 1.5)),
-                        SizedBox(height: 10),
-                        Expanded(
-                            child: GridView.count(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                children: [
-                              ...state.imagePaths
-                                  .map((path) => Container(
-                                      color: Colors.grey[200],
-                                      child: Image.file(File(path))))
-                                  .toList(),
-                              GestureDetector(
-                                onTap: () =>
-                                    bloc(context).add(AddImageButtonClicked()),
-                                child: Container(
-                                  color: Colors.grey[200],
-                                  child: Icon(Icons.add_a_photo),
-                                ),
-                              )
-                            ]))
-                      ]),
-                    )))));
+                    body: ListView(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(16.0),
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              Text(
+                                "Type: ",
+                                textScaleFactor: 1.2,
+                              ),
+                              state.availablePlaceTypes.isNotEmpty
+                                  ? DropdownButton<PlaceTypeDto>(
+                                      value: state.selectedPlaceType,
+                                      items: state.availablePlaceTypes
+                                          .map((type) =>
+                                              DropdownMenuItem<PlaceTypeDto>(
+                                                  value: type,
+                                                  child: Text(type.name)))
+                                          .toList(),
+                                      onChanged: (value) => bloc(context)
+                                          .add(PlaceTypeChanged(value)))
+                                  : SizedBox(),
+                            ],
+                          ),
+                          TextField(
+                              decoration: InputDecoration(
+                                  labelText: 'Title',
+                                  errorText: state.name.isEmpty
+                                      ? "Please enter a title"
+                                      : null),
+                              maxLength: 50,
+                              maxLengthEnforced: true,
+                              onChanged: (value) =>
+                                  bloc(context).add(NameChanged(name: value))),
+                          TextField(
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              decoration:
+                                  InputDecoration(labelText: 'Description'),
+                              maxLength: 500,
+                              onChanged: (value) => bloc(context)
+                                  .add(DescriptionChanged(description: value))),
+                          Container(
+                              height: 200,
+                              child: MapPreview(location: location)),
+                          SizedBox(height: 30),
+                          Align(
+                              alignment: Alignment.topLeft,
+                              child:
+                                  Text('Add pictures:', textScaleFactor: 1.5)),
+                          SizedBox(height: 10),
+                          GridView.count(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              children: [
+                                ...state.imagePaths
+                                    .map((path) => Container(
+                                        color: Colors.grey[200],
+                                        child: Image.file(File(path))))
+                                    .toList(),
+                                GestureDetector(
+                                  onTap: () => bloc(context)
+                                      .add(AddImageButtonClicked()),
+                                  child: Container(
+                                    color: Colors.grey[200],
+                                    child: Icon(Icons.add_a_photo),
+                                  ),
+                                )
+                              ])
+                        ])))));
   }
 
-  Widget _getAppBarAction(
-      BuildContext context, AddPlaceScreenFormStatus status) {
+  Widget _getAppBarAction(BuildContext context, FormStatus status) {
     switch (status) {
-      case AddPlaceScreenFormStatus.invalid:
+      case FormStatus.invalid:
         return FlatButton(
           textColor: Colors.white,
           onPressed: null,
@@ -118,7 +123,7 @@ class AddPlaceScreen extends StatelessWidget {
         );
         break;
 
-      case AddPlaceScreenFormStatus.valid:
+      case FormStatus.valid:
         return FlatButton(
           textColor: Colors.white,
           onPressed: () => BlocProvider.of<AddPlaceScreenBloc>(context)
@@ -126,8 +131,8 @@ class AddPlaceScreen extends StatelessWidget {
           child: Text("Save"),
         );
         break;
-      case AddPlaceScreenFormStatus.loading:
-      case AddPlaceScreenFormStatus.done:
+      case FormStatus.loading:
+      case FormStatus.done:
         return Center(
             child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white)));

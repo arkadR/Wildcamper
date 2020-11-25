@@ -50,7 +50,9 @@ class MapSample extends StatelessWidget {
                                   onPressed: () {
                                     Navigator.pop(dialogContext);
                                     Navigator.of(context)
-                                        .push(_createAddPlaceRoute(latLng));
+                                        .push(_createAddPlaceRoute(latLng))
+                                        .then((value) => bloc(context)
+                                            .add(PlaceLoadRequested()));
                                   },
                                   child: Text("Yes"))
                             ],

@@ -26,12 +26,20 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onSearchChanged(String value) {
-    var filtered = _places.where(
-        (place) => place.name.toLowerCase().contains(value.toLowerCase()));
+    var filtered = _places.where((place) =>
+        satisfies(place.name, value) ||
+        satisfies(place.country, value) ||
+        satisfies(place.region, value) ||
+        satisfies(place.city, value));
     setState(() {
       _visiblePlaces.clear();
       _visiblePlaces.addAll(filtered);
     });
+  }
+
+  bool satisfies(String string, String criteria) {
+    if (string == null) return false;
+    return string.toLowerCase().contains(criteria.toLowerCase());
   }
 
   @override

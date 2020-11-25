@@ -48,7 +48,7 @@ namespace Wildcamper.API
 
       services.AddOData();
 
-      services.AddOpenApiDocument();
+      // services.AddOpenApiDocument();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -66,8 +66,8 @@ namespace Wildcamper.API
 
       app.UseAuthorization();
 
-      app.UseOpenApi();
-      app.UseReDoc();
+      // app.UseOpenApi();
+      // app.UseReDoc();
 
       app.UseEndpoints(endpoints =>
       {
@@ -85,6 +85,7 @@ namespace Wildcamper.API
       odataBuilder.EntitySet<Place>("Places");
       odataBuilder.EntitySet<Image>("Images");
       odataBuilder.EntitySet<Rating>("Ratings");
+      odataBuilder.EntitySet<PlaceType>("PlaceTypes");
 
       return odataBuilder.GetEdmModel();
     }

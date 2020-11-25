@@ -7,7 +7,8 @@ class PlaceCard extends StatelessWidget {
   final Place place;
 
   final Function onRemoveTapped;
-  PlaceCard({this.place, this.onRemoveTapped});
+  final Function onEditTapped;
+  PlaceCard({this.place, this.onRemoveTapped, this.onEditTapped});
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +25,23 @@ class PlaceCard extends StatelessWidget {
                       textScaleFactor: 1.5,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    onRemoveTapped != null
-                        ? Expanded(
-                            child: Align(
-                                alignment: Alignment.topRight,
-                                child: GestureDetector(
-                                    onTap: onRemoveTapped,
-                                    child: Icon(Icons.delete_forever))))
-                        : SizedBox()
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          onEditTapped == null
+                              ? SizedBox()
+                              : GestureDetector(
+                                  onTap: onEditTapped, child: Icon(Icons.edit)),
+                          SizedBox(width: 8.0),
+                          onRemoveTapped == null
+                              ? SizedBox()
+                              : GestureDetector(
+                                  onTap: onRemoveTapped,
+                                  child: Icon(Icons.delete_forever))
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(

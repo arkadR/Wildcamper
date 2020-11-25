@@ -1,4 +1,7 @@
 import 'package:WildcamperMobile/Domain/model/Place.dart';
+import 'package:WildcamperMobile/Domain/model/user.dart';
+import 'package:WildcamperMobile/Domain/repositories/IRatingsRepository.dart';
+import 'package:WildcamperMobile/Domain/repositories/IUsersRepository.dart';
 import 'package:WildcamperMobile/Domain/repositories/places_repository.dart';
 import 'package:WildcamperMobile/Infrastructure/UserProvider.dart';
 import 'package:equatable/equatable.dart';
@@ -13,13 +16,18 @@ part 'PlaceScreenState.dart';
 part 'PlaceScreenEvent.dart';
 
 class PlaceScreenBloc extends Bloc<PlaceScreenEvent, PlaceScreenState> {
-  PlaceScreenBloc(int placeId) : super(PlaceScreenState.initial()) {
+  PlaceScreenBloc(this.placeId) : super(PlaceScreenState.initial()) {
     _placesRepository
         .getPlaceById(placeId)
         .then((place) => add(PlaceLoaded(place)));
+    _usersRepository.getUsers().then((users) => add(UsersLoaded(users)));
   }
   final UserProvider _userProvider = GetIt.instance<UserProvider>();
+  final IRatingsRepository _ratingsRepository =
+      GetIt.instance<IRatingsRepository>();
+  final IUsersRepository _usersRepository = GetIt.instance<IUsersRepository>();
   String get userId => _userProvider.getCurrentUser().uid;
+  final int placeId;
 
   final IPlacesRepository _placesRepository =
       GetIt.instance<IPlacesRepository>();
@@ -32,8 +40,20 @@ class PlaceScreenBloc extends Bloc<PlaceScreenEvent, PlaceScreenState> {
       var showAddRating = shouldShowAddRatingsSection(userId, event.place);
       yield state.copyWith(place: event.place, showAddRating: showAddRating);
     }
+    if (event is PlaceLoadRequested) {
+      _placesRepository
+          .getPlaceById(placeId, force: true)
+          .then((place) => add(PlaceLoaded(place)));
+    }
     if (event is DistanceCalculated) {
       yield state.copyWith(distance: event.distance);
+    }
+    if (event is ReviewRemoved) {
+      await _ratingsRepository.removeRating(event.reviewId);
+      add(PlaceLoadRequested());
+    }
+    if (event is UsersLoaded) {
+      yield state.copyWith(users: event.users);
     }
   }
 

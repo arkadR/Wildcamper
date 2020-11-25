@@ -10,13 +10,14 @@ import 'AddReviewSectionState.dart';
 class AddReviewSectionBloc
     extends Bloc<AddReviewSectionEvent, AddReviewSectionState> {
   final int placeId;
+  final Function onSubmit;
 
   final IRatingsRepository _ratingsRepository =
       GetIt.instance<IRatingsRepository>();
   final UserProvider _userProvider = GetIt.instance<UserProvider>();
   String get userId => _userProvider.getCurrentUser().uid;
 
-  AddReviewSectionBloc({@required this.placeId})
+  AddReviewSectionBloc({@required this.onSubmit, @required this.placeId})
       : super(AddReviewSectionState.initial());
 
   @override
@@ -36,6 +37,7 @@ class AddReviewSectionBloc
       }
       var ratingId = await _ratingsRepository.addRating(
           userId, placeId, state.comment, state.rating.toInt());
+      onSubmit();
     }
   }
 }

@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LinkCollectionApp.Extensions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Wildcamper.API.Models;
 
 namespace Wildcamper.API.Controllers
 {
-  public class PlacesController : ControllerBase
+  public class PlacesController : ODataController
   {
     private readonly WildcamperContext _context;
 
@@ -43,97 +45,48 @@ namespace Wildcamper.API.Controllers
       return Created(new Uri($"{Request.Path}/{model.PlaceId}", UriKind.Relative), model);
     }
 
-    // GET: api/Places/5
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<Place>> GetPlace(int id)
-    // {
-    //   var place = await _context.Place
-    //     .Include(p => p.Images)
-    //     .SingleOrDefaultAsync(p => p.PlaceId == id);
-    //
-    //   if (place == null)
-    //     return NotFound();
-    //
-    //   return place;
-    // }
-    //
-    // // PUT: api/Places/5
-    // // To protect from overposting attacks, enable the specific properties you want to bind to, for
-    // // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> PutPlace(int id, Place place)
-    // {
-    //   if (id != place.PlaceId)
-    //   {
-    //     return BadRequest();
-    //   }
-    //
-    //   _context.Entry(place).State = EntityState.Modified;
-    //
-    //   try
-    //   {
-    //     await _context.SaveChangesAsync();
-    //   }
-    //   catch (DbUpdateConcurrencyException)
-    //   {
-    //     if (!PlaceExists(id))
-    //     {
-    //       return NotFound();
-    //     }
-    //     else
-    //     {
-    //       throw;
-    //     }
-    //   }
-    //
-    //   return NoContent();
-    // }
-    //
-    // // POST: api/Places
-    // // To protect from overposting attacks, enable the specific properties you want to bind to, for
-    // // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-    // [HttpPost]
-    // public async Task<ActionResult<Place>> PostPlace(Place place)
-    // {
-    //   _context.Place.Add(place);
-    //   try
-    //   {
-    //     await _context.SaveChangesAsync();
-    //   }
-    //   catch (DbUpdateException)
-    //   {
-    //     if (PlaceExists(place.PlaceId))
-    //     {
-    //       return Conflict();
-    //     }
-    //     else
-    //     {
-    //       throw;
-    //     }
-    //   }
-    //
-    //   return CreatedAtAction("GetPlace", new { id = place.PlaceId }, place);
-    // }
-    //
-    // // DELETE: api/Places/5
-    // [HttpDelete("{id}")]
-    // public async Task<ActionResult<Place>> DeletePlace(int id)
-    // {
-    //   var place = await _context.Place.FindAsync(id);
-    //   if (place == null)
-    //   {
-    //     return NotFound();
-    //   }
-    //
-    //   _context.Place.Remove(place);
-    //   await _context.SaveChangesAsync();
-    //
-    //   return place;
-    // }
-    //
-    // private bool PlaceExists(int id)
-    // {
-    //   return _context.Place.Any(e => e.PlaceId == id);
-    // }
+    public async Task<IActionResult> Delete([FromODataUri] int key)
+    {
+      var place = await _context.Place.FindAsync(key);
+      if (place == null)
+        return NotFound();
+
+      _context.Rating.RemoveAll(r => r.PlaceId == key);
+      _context.Image.RemoveAll(i => i.PlaceId == key);
+      
+      _context.Place.Remove(place);
+      await _context.SaveChangesAsync();
+      return NoContent();
+    }
+
+    public async Task<IActionResult> Patch([FromODataUri] int key, Delta<Place> place)
+    {
+      if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+      
+      var entity = await _context.Place.FindAsync(key);
+      if (entity == null)
+        return NotFound();
+      
+      place.Patch(entity);
+      try
+      {
+        await _context.SaveChangesAsync();
+      }
+      catch (DbUpdateConcurrencyException)
+      {
+        if (!ProductExists(key))
+          return NotFound();
+        
+        else
+          throw;
+      }
+      return Updated(entity);
+    }
+
+    private bool ProductExists(int key)
+    {
+      return _context.Place.Any(p => p.PlaceId == key);
+    }
   }
 }

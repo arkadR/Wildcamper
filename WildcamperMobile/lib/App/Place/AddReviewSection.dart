@@ -9,8 +9,11 @@ import 'bloc/AddReviewSectionState.dart';
 
 class AddReviewSection extends StatelessWidget {
   final Place place;
+  final Function onSubmit;
 
-  const AddReviewSection({Key key, this.place}) : super(key: key);
+  const AddReviewSection(
+      {Key key, @required this.place, @required this.onSubmit})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,8 @@ class AddReviewSection extends StatelessWidget {
 
     return SliverToBoxAdapter(
         child: BlocProvider<AddReviewSectionBloc>(
-      create: (context) => AddReviewSectionBloc(placeId: place.placeId),
+      create: (context) =>
+          AddReviewSectionBloc(placeId: place.placeId, onSubmit: onSubmit),
       child: BlocBuilder<AddReviewSectionBloc, AddReviewSectionState>(
         builder: (context, state) {
           return Padding(

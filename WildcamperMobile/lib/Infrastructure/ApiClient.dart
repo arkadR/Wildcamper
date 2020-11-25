@@ -16,4 +16,8 @@ class ApiClient {
   Future<Response<T>> delete<T>(String path) async {
     return await _dio.delete<T>("$_basePath$path");
   }
+
+  Future<Response<T>> patch<T>(String path, dynamic data) async {
+    return await _dio.patch<T>("$_basePath$path", data: data);
+  }
 }
