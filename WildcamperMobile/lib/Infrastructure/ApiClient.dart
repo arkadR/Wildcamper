@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 
 class ApiClient {
   final Dio _dio = GetIt.instance<Dio>();
-  final String _basePath = 'https://192.168.0.103:44310/';
+  final String _basePath = 'https://192.168.1.27:44310/';
 
   Future<Response<T>> get<T>(String path) async {
     return await _dio.get<T>("$_basePath$path");
